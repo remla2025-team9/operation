@@ -117,10 +117,14 @@ Code for training ML models using datasets, including preprocessing, training, e
 
 **REPOSITORY SETUP INSTRUCTIONS:**
 
-```bash
-pip install -r requirements.txt
-python train.py  # Adjust with correct CLI args if applicable
-```
+The instructions to setup the repository and train/acquire a model can be found in the [README](https://github.com/remla2025-team9/model-training/blob/a1/README.md) of the repository.
+
+**IMPLEMENTED FUNCTIONALITY:**
+
+- The model training pipeline can successfully train a model and generate a model artifact to be used in the model service.
+- Workflow for CI on every PR to the main branch to ensure that the model training pipeline is working correctly.
+- Workflow for Continuous Development for automated versioning of the branch (pre-releases) and automatic release of a pre-release version of the model artifact to be used in the model service.
+- Workflow for Continuous Deployment for a successful full release of the model as artifact to be used in the model service. Additional automated version bumping for the main branch after each successful release
 
 ---
 
