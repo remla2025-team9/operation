@@ -6,8 +6,13 @@ This repository helps connect and run the services developed by REMLA 2025 Team 
 
 Make sure Docker and Docker Compose are installed. Then:
 
+Configure the env files for each service:
+* app-service.env
+* app-frontend.env
+* model-service.env
+
 ```bash
-docker-compose up --build
+docker-compose up -d
 ```
 
 To stop the services:
