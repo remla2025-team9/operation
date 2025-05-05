@@ -1,0 +1,21 @@
+version: '3.12'
+services:
+  app-service:
+    image: ghcr.io/remla2025-team9/app-service:latest
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - MODEL_SERVICE_URL=http://model-service:5001
+    depends_on:
+      - model-service
+
+  model-service:
+    image: ghcr.io/remla2025-team9/model-service:latest
+    ports:
+      - "5001:5001"
+
+  frontend:
+    image: ghcr.io/remla2025-team9/app-frontend:latest
+    ports:
+      - "3000:3000"
