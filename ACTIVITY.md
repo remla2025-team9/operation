@@ -26,8 +26,8 @@ operation: https://github.com/remla2025-team9
 - Approved PR: -
   
 ### Lucian
-- Created PR: 
-- Approved PR:
+- Created PR: https://github.com/remla2025-team9/model-service/pull/8
+- Approved PR: https://github.com/remla2025-team9/app-frontend/pull/5
 
 ### Comments for a1
 <!-- Insert any comments regarding the assignments (e.g. what we didn't implemenet yet, if there are any bugs) here -->
