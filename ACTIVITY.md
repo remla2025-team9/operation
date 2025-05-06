@@ -22,8 +22,8 @@ operation: https://github.com/remla2025-team9
 - Approved PR:
 
 ### Shuang
-- Created PR: https://github.com/remla2025-team9/lib-ml/pull/7
-- Approved PR: -
+- Created PR: https://github.com/remla2025-team9/lib-ml/pull/2
+- Approved PR:  https://github.com/remla2025-team9/model-service/pull/8
   
 ### Lucian
 - Created PR: https://github.com/remla2025-team9/model-service/pull/8
