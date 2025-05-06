@@ -1,4 +1,7 @@
+version: "3.12"
+
 services:
+  # Flask backend service
   app-service:
     image: ghcr.io/remla2025-team9/app-service:latest
     env_file:
@@ -6,25 +9,31 @@ services:
     depends_on:
       - model-service
     restart: on-failure
+    ports:
+      - "5000:5000"
 
+  # Machine learning model API
   model-service:
     image: ghcr.io/remla2025-team9/model-service:latest
-    environment:
-      - SECRETS_FILE=/run/secrets/example-secret
     env_file:
       - model-service.env
+    environment:
+      - SECRETS_FILE=/run/secrets/example-secret
     restart: on-failure
     volumes:
       - model-cache:/root/.cache
     secrets:
       - example-secret
+    ports:
+      - "5001:5001"
 
+  # Frontend application
   frontend:
     image: ghcr.io/remla2025-team9/app-frontend:latest
-    ports:
-      - "3000:3000"
     env_file:
       - app-frontend.env
+    ports:
+      - "3000:3000"
     restart: on-failure
 
 volumes:
