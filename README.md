@@ -43,7 +43,7 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 - Repository link: https://github.com/remla2025-team9/app-service  
 
-Flask-based web service providing the main API interface. Includes a `/healthcheck` route and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing.
+Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing.
 
 **REPOSITORY SETUP INSTRUCTIONS:**
 
@@ -147,4 +147,8 @@ npm run dev
 # Or build and serve:
 npm run build
 npm run preview
+
+# Or use Docker
+docker build -t app-frontend .
+docker run -p 5000:5000 app-frontend
 ```
