@@ -24,7 +24,7 @@ docker-compose down
 If you're using GitHub Container Registry (GHCR) images and encounter permission errors, log in first:
 
 ```bash
-echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+echo $GH_TOKEN | docker login ghcr.io -u ${USERNAME} --password-stdin
 ```
 
 ---
@@ -33,121 +33,51 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 ### Operation
 
-- Repository link: https://github.com/remla2025-team9/operation  
-- Orchestrates all project services using `docker-compose`  
-- Includes `README.md`, `docker-compose.yml`, and activity log for all assignments  
+- **Link:** https://github.com/remla2025-team9/operation  
+- Orchestrates all project services using `docker-compose`, includes `README.md`, `docker-compose.yml`, and activity log for all assignments.
 
 ---
 
 ### app-service
 
-- Repository link: https://github.com/remla2025-team9/app-service  
-
-Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing.
-
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-```bash
-# Local development
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python app.py
-
-# Or use Docker
-docker build -t app-service .
-docker run -p 5000:5000 app-service
-```
+- **Link:** https://github.com/remla2025-team9/app-service  
+Flask-based API service with `/healthcheck` and `/version` routes. CI/CD enabled for automatic versioning and image publishing.
 
 ---
 
 ### model-service
 
-- Repository link: https://github.com/remla2025-team9/model-service  
-
-Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.
-
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-```bash
-# Local setup
-pip install -r requirements.txt
-python app.py
-
-# Docker
-docker build -t model-service .
-docker run -p 5001:5001 model-service
-```
+- **Link:** https://github.com/remla2025-team9/model-service  
+Provides ML model predictions via REST API. Pre-built with Docker support and integration with `app-service`.
 
 ---
 
 ### lib-version
 
-- Repository: https://github.com/remla2025-team9/lib-version  
-- Python utility library that provides a `VersionUtil` class for retrieving the current version  
-- Used in `app-service` to expose the library version via `/api/version` endpoint  
-- Frontend fetches this version using JavaScript and displays it in the UI
-
-**Backend usage**:
-
-```python
-@app.route("/api/version")
-def get_lib_version():
-    return jsonify({"lib_version": VersionUtil.get_version()})
-```
+- **Link:** https://github.com/remla2025-team9/lib-version  
+Python utility library (`VersionUtil`) for retrieving and exposing library version in APIs.
 
 ---
 
 ### lib-ml
 
-- Repository link: https://github.com/remla2025-team9/lib-ml  
-
-Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.
-
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-```bash
-pip install .
-# Usage depends on the specific modules within the library
-```
+- **Link:** https://github.com/remla2025-team9/lib-ml  
+Shared utilities for data preprocessing and ML-related logic, used by training and inference workflows.
 
 ---
 
 ### model-training
 
-- Repository link: https://github.com/remla2025-team9/model-training  
-
-Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.
-
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-The instructions to setup the repository and train/acquire a model can be found in the [README](https://github.com/remla2025-team9/model-training/blob/a1/README.md) of the repository.
-
-**IMPLEMENTED FUNCTIONALITY:**
-
-- The model training pipeline can successfully train a model and generate a model artifact to be used in the model service.
-- Workflow for CI on every PR to the main branch to ensure that the model training pipeline is working correctly.
-- Workflow for Continuous Development for automated versioning of the branch (pre-releases) and automatic release of a pre-release version of the model artifact to be used in the model service.
-- Workflow for Continuous Deployment for a successful full release of the model as artifact to be used in the model service. Additional automated version bumping for the main branch after each successful release
+- **Link:** https://github.com/remla2025-team9/model-training  
+Training pipelines for ML models with automated CI/CD workflows for artifact releases.
 
 ---
 
 ### app-frontend
 
-- Repository link: https://github.com/remla2025-team9/app-frontend  
+- **Link:** https://github.com/remla2025-team9/app-frontend  
+Frontend application displaying system status, version info, and predictions from `app-service`.
 
-Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.
+---
 
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-```bash
-npm install
-npm run dev
-# Or build and serve:
-npm run build
-npm run preview
-
-# Or use Docker
-docker build -t app-frontend .
-docker run -p 5000:5000 app-frontend
-```
+*For detailed setup and usage instructions for each service, refer to the respective repository README.*
