@@ -83,18 +83,17 @@ docker run -p 5001:5001 model-service
 
 ### lib-version
 
-- Repository link: https://github.com/remla2025-team9/lib-version  
+- Repository: https://github.com/remla2025-team9/lib-version  
+- Python utility library that provides a `VersionUtil` class for retrieving the current version  
+- Used in `app-service` to expose the library version via `/api/version` endpoint  
+- Frontend fetches this version using JavaScript and displays it in the UI
 
-Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.
+**Backend usage**:
 
-**REPOSITORY SETUP INSTRUCTIONS:**
-
-```bash
-# Install locally
-pip install .
-
-# Test version retrieval
-python -c "from lib_version.version_util import VersionUtil; print(VersionUtil.get_version())"
+```python
+@app.route("/api/version")
+def get_lib_version():
+    return jsonify({"lib_version": VersionUtil.get_version()})
 ```
 
 ---
