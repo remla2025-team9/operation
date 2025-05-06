@@ -1,11 +1,13 @@
 operation: https://github.com/remla2025-team9
 # Assignment 1
 ## Assignment 1 Tags for the repositories
-- model_training: https://github.com/remla2025-team9/model-training/tree/a1
-- model_service:
-- lib-ml:
-- app:
-- ...
+- model_training: [https://github.com/remla2025-team9/model-training/tags](https://github.com/remla2025-team9/model-training/tags)
+- model_service: [https://github.com/remla2025-team9/model-service/tags](https://github.com/remla2025-team9/model-service/tags)
+- lib-ml: [https://github.com/remla2025-team9/lib-ml/tags](https://github.com/remla2025-team9/lib-ml/tags)
+- app-service: [https://github.com/remla2025-team9/app-service/tags](https://github.com/remla2025-team9/app-service/tags)
+- lib-version: [https://github.com/remla2025-team9/lib-version/tags](https://github.com/remla2025-team9/lib-version/tags)
+- app-frontend: [https://github.com/remla2025-team9/app-frontend/tags](https://github.com/remla2025-team9/app-frontend/tags)
+- operation: [https://github.com/remla2025-team9/operation/tags](https://github.com/remla2025-team9/operation/tags)
 
 ### Timo
 - Created PR: https://github.com/remla2025-team9/app-service/pull/2
