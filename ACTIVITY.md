@@ -18,8 +18,8 @@ operation: https://github.com/remla2025-team9
 - Approved PR: https://github.com/remla2025-team9/app-service/pull/2
 
 ### Artin
-- Created PR:
-- Approved PR:
+- Created PR: https://github.com/remla2025-team9/lib-version/pull/1
+- Approved PR: https://github.com/remla2025-team9/app-service/pull/2
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/lib-ml/pull/2
