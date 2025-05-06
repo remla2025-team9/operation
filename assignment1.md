@@ -10,5 +10,3 @@
 ### Comments for a1
 Every rubric is implemented up to the Excellent level, except:
 - The API for making a prediction in model-service is implemented, but it is not yet called by the app
-- app-service does not have lib-version as a dependency
-
