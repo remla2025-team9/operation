@@ -1,0 +1,9 @@
+- name: Install Kubernetes binaries (worker)
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+      - kubeadm
+      - kubelet
