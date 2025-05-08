@@ -1,2 +1,4 @@
 .idea
 *.env
+# Ignore Vagrant environment files
+.vagrant/
