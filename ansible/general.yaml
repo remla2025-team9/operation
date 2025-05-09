@@ -1,23 +1,8 @@
----
 - name: General setup for all nodes
   hosts: all
-  become: true
+  become: yes
+
   tasks:
-
-    - name: Ensure .ssh directory exists
-      file:
-        path: "/home/vagrant/.ssh"
-        state: directory
-        mode: '0700'
-        owner: vagrant
-        group: vagrant
-
-    - name: Add SSH public keys for all team members
-      ansible.posix.authorized_key:
-        user: vagrant
-        state: present
-        key: "{{ lookup('file', item) }}"
-      with_fileglob:
-        - "files/*.pub"
-    
-
+    - name: Update APT package index
+      apt:
+        update_cache: yes

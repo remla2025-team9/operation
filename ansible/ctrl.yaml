@@ -1,10 +1,16 @@
-- name: Install Kubernetes binaries
-  apt:
-    name: "{{ packages }}"
-    state: present
-    update_cache: yes
+- name: Setup Kubernetes controller node
+  hosts: ctrl
+  become: yes
+
   vars:
     packages:
       - kubelet
       - kubeadm
-      - kubectl   
+      - kubectl
+
+  tasks:
+    - name: Install Kubernetes binaries
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes

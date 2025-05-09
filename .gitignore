@@ -2,3 +2,7 @@
 *.env
 # Ignore Vagrant environment files
 .vagrant/
+# SSH keys
+ssh/id_rsa*
+ssh/*_rsa
+ssh/*_rsa.pub
