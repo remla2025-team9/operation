@@ -1,5 +1,5 @@
 - name: Setup Kubernetes controller node
-  hosts: ctrl
+  hosts: control
   become: yes
 
 
