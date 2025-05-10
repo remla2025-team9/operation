@@ -42,14 +42,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # Generate the inventory.cfg file
         ctrl.vm.provision "shell", run: "always" do |s|
             inventory = <<-SCRIPT
-echo "[ctrl]" > /vagrant/inventory.cfg
-echo "#{BASE_IP}100" >> /vagrant/inventory.cfg
+echo "[control]" > /vagrant/inventory.cfg
+echo "ctrl ansible_host=#{BASE_IP}100" >> /vagrant/inventory.cfg
 echo "" >> /vagrant/inventory.cfg
 echo "[nodes]" >> /vagrant/inventory.cfg
             SCRIPT
 
             (1..WORKER_COUNT).each do |i|
-                inventory += "echo \"#{BASE_IP}10#{i}\" >> /vagrant/inventory.cfg\n"
+                inventory += "echo \"node-#{i} ansible_host=#{BASE_IP}10#{i}\" >> /vagrant/inventory.cfg\n"
             end
 
             s.inline = inventory
@@ -57,8 +57,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/general.yaml"
-            ansible.limit = "ctrl"
-            ansible.inventory_path = "inventory.cfg"  
+            ansible.limit = "control"
+            ansible.inventory_path = "./inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -66,8 +66,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/ctrl.yaml"
-            ansible.limit = "ctrl"
-            ansible.inventory_path = "inventory.cfg"  
+            ansible.limit = "control"
+            ansible.inventory_path = "./inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -88,7 +88,7 @@ echo "[nodes]" >> /vagrant/inventory.cfg
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/general.yaml"
                 ansible.limit = "node-#{i}"
-                ansible.inventory_path = "inventory.cfg"  
+                ansible.inventory_path = "./inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
@@ -98,7 +98,7 @@ echo "[nodes]" >> /vagrant/inventory.cfg
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/node.yaml"
                 ansible.limit = "node-#{i}"
-                ansible.inventory_path = "inventory.cfg"  
+                ansible.inventory_path = "./inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
