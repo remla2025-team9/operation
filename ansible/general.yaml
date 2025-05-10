@@ -12,5 +12,5 @@
           - gnupg
           - lsb-release
         state: present
-        update_cache: yes
+        
 
