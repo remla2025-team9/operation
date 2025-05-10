@@ -3,10 +3,6 @@
   become: yes
 
   tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-
     - name: Install dependencies
       apt:
         name:
@@ -16,4 +12,5 @@
           - gnupg
           - lsb-release
         state: present
+        update_cache: yes
 
