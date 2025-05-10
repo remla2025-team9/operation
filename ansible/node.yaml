@@ -1,12 +1,3 @@
 - name: Setup Kubernetes worker nodes
   hosts: nodes
   become: yes
-
-  tasks:
-    - name: Install kubelet and kubeadm
-      apt:
-        name:
-          - kubelet
-          - kubeadm
-        state: present
-        update_cache: yes

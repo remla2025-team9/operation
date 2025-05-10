@@ -3,6 +3,13 @@
   become: yes
 
   tasks:
-    - name: Update APT package index
+    - name: Install dependencies
       apt:
-        update_cache: yes
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+

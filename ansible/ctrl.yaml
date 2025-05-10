@@ -2,15 +2,5 @@
   hosts: ctrl
   become: yes
 
-  vars:
-    packages:
-      - kubelet
-      - kubeadm
-      - kubectl
 
-  tasks:
-    - name: Install Kubernetes binaries
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: yes
+
