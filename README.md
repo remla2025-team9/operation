@@ -42,3 +42,28 @@ Each repository has a `README.md` file with information about running. Below is 
 | [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
 | [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
 | [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
+## Provision
+
+Start the environment:
+
+```bash
+vagrant up --provision
+```
+
+Base Configuration:
+
+- All VMs use the `bento/ubuntu-24.04` box.
+- VMs are assigned static IPs in the `192.168.56.*` range:
+  - Controller node (`ctrl`): `192.168.56.100`
+  - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
+
+Ansible Provisioning:
+
+Each VM is further configured using Ansible playbooks:
+
+- **Controller (`ctrl`)** runs:
+  - `ansible/general.yaml`
+  - `ansible/ctrl.yaml`
+- **Worker nodes (`node-X`)** run:
+  - `ansible/general.yaml`
+  - `ansible/node.yaml`

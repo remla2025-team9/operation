@@ -1,0 +1,3 @@
+- name: Setup Kubernetes worker nodes
+  hosts: all
+  become: yes

@@ -1,0 +1,7 @@
+- name: General setup for all nodes
+  hosts: all
+  become: yes
+
+
+        
+
