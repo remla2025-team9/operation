@@ -47,7 +47,7 @@ Each repository has a `README.md` file with information about running. Below is 
 Start the environment:
 
 ```bash
-vagrant up
+vagrant up --provision
 ```
 
 Base Configuration:

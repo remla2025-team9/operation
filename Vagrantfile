@@ -57,8 +57,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/general.yaml"
-            ansible.limit = "control"
-            ansible.inventory_path = "./inventory.cfg"
+            #ansible.limit = "control"
+            #ansible.inventory_path = "./inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -66,8 +66,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/ctrl.yaml"
-            ansible.limit = "control"
-            ansible.inventory_path = "./inventory.cfg"
+            #ansible.limit = "control"
+            #ansible.inventory_path = "./inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -87,8 +87,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/general.yaml"
-                ansible.limit = "node-#{i}"
-                ansible.inventory_path = "./inventory.cfg"
+                #ansible.limit = "node-#{i}"
+                #ansible.inventory_path = "./inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
@@ -97,8 +97,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/node.yaml"
-                ansible.limit = "node-#{i}"
-                ansible.inventory_path = "./inventory.cfg"
+                #ansible.limit = "node-#{i}"
+                #ansible.inventory_path = "./inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
