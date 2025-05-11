@@ -24,7 +24,7 @@
 # Assignment 2
 
 ### Timo
-- Created PR: 
+- Created PR: https://github.com/remla2025-team9/operation/pull/16 
 - Approved PR: https://github.com/remla2025-team9/operation/pull/14 
 
 ### Raoul
