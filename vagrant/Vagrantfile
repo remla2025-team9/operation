@@ -17,27 +17,16 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "bento/ubuntu-24.04"
     config.ssh.insert_key = false
 
-    # Copy all public keys to the VM
-    # ['public_key_1', 'public_key_2'].each do |name|
-    #     config.vm.provision "file", run: "always" do |f|
-    #         f.source = File.expand_path("ssh/#{name}.pub", __dir__)
-    #         f.destination = "/tmp/#{name}.pub"
-    #     end
-    # end
-
-    # # Append public keys to authorized_keys
-    # config.vm.provision "shell", privileged: true, inline: <<-SHELL
-    #     mkdir -p /home/vagrant/.ssh
-    #     chmod 700 /home/vagrant/.ssh
-
-    #     for key in /tmp/*.pub; do
-    #         cat "$key" >> /home/vagrant/.ssh/authorized_keys
-    #     done
-
-    #     chmod 600 /home/vagrant/.ssh/authorized_keys
-    #     chown -R vagrant:vagrant /home/vagrant/.ssh
-    #     systemctl restart ssh
-    # SHELL
+    # Create inventory file on the host machine first
+    File.open("inventory.cfg", "w") do |f|
+        f.puts "[control]"
+        f.puts "ctrl ansible_host=#{BASE_IP}100"
+        f.puts ""
+        f.puts "[nodes]"
+        (1..WORKER_COUNT).each do |i|
+            f.puts "node-#{i} ansible_host=#{BASE_IP}10#{i}"
+        end
+    end
 
     config.vm.define "ctrl" do |ctrl|
         ctrl.vm.hostname = "ctrl"
@@ -49,26 +38,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             vb.cpus = CONTROLLER_CPU_COUNT 
         end
 
-        # Generate the inventory.cfg file
-        ctrl.vm.provision "shell", run: "always" do |s|
-            inventory = <<-SCRIPT
-echo "[control]" > /vagrant/inventory.cfg
-echo "ctrl ansible_host=#{BASE_IP}100" >> /vagrant/inventory.cfg
-echo "" >> /vagrant/inventory.cfg
-echo "[nodes]" >> /vagrant/inventory.cfg
-            SCRIPT
-
-            (1..WORKER_COUNT).each do |i|
-                inventory += "echo \"node-#{i} ansible_host=#{BASE_IP}10#{i}\" >> /vagrant/inventory.cfg\n"
-            end
-
-            s.inline = inventory
-        end
-
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/general.yaml"
-            #ansible.limit = "control"
-            ansible.inventory_path = "./inventory.cfg"
+            ansible.limit = "ctrl"
+            ansible.inventory_path = "inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -76,8 +49,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
         ctrl.vm.provision "ansible" do |ansible|
             ansible.playbook = "ansible/ctrl.yaml"
-            #ansible.limit = "control"
-            ansible.inventory_path = "./inventory.cfg"
+            ansible.limit = "ctrl"
+            ansible.inventory_path = "inventory.cfg"
             ansible.extra_vars = {
                 worker_count: WORKER_COUNT
             }
@@ -97,8 +70,8 @@ echo "[nodes]" >> /vagrant/inventory.cfg
 
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/general.yaml"
-                #ansible.limit = "node-#{i}"
-                ansible.inventory_path = "./inventory.cfg"
+                # ansible.limit = "node-#{i}"
+                ansible.inventory_path = "inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
@@ -108,7 +81,7 @@ echo "[nodes]" >> /vagrant/inventory.cfg
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/node.yaml"
                 #ansible.limit = "node-#{i}"
-                ansible.inventory_path = "./inventory.cfg"
+                ansible.inventory_path = "inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
                     worker_count: WORKER_COUNT
