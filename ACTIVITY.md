@@ -20,3 +20,25 @@
 - Created PR: https://github.com/remla2025-team9/model-service/pull/8
 - Approved PR: https://github.com/remla2025-team9/app-frontend/pull/5
 
+
+# Assignment 2
+
+### Timo
+- Created PR: 
+- Approved PR: https://github.com/remla2025-team9/operation/pull/14 
+
+### Raoul
+- Created PR: 
+- Approved PR:
+
+### Artin
+- Created PR:
+- Approved PR:
+
+### Shuang
+- Created PR:
+- Approved PR:
+  
+### Lucian
+- Created PR:
+- Approved PR:
