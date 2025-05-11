@@ -1,7 +1,8 @@
 ---
 - hosts: all
   become: yes
-
+  gather_facts: no
+  
   vars:
     ssh_key_pattern: "{{ playbook_dir }}/../ssh/*.pub"
 
