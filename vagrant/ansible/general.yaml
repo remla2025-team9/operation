@@ -115,17 +115,23 @@
     
     - name: Configure containerd
       block: 
+        - name: Check if containerd config exists # When this file exists, we don't need to overwrite it in the next tasks
+          ansible.builtin.stat:
+            path: /etc/containerd/config.toml
+          register: config_file
+
         - name: Ensure /etc/containerd directory exists
           ansible.builtin.file:
             path: /etc/containerd
             state: directory
             owner: root
+          when: not config_file.stat.exists
 
         - name: Get containerd config
           ansible.builtin.command: containerd config default
           register: containerd_config
-          changed_when: false
           check_mode: false
+          when: not config_file.stat.exists
 
         - name: Write containerd config to /etc/containerd/config.toml
           ansible.builtin.copy:
@@ -134,6 +140,7 @@
             owner: root
             group: root
             mode: '0644'
+          when: not config_file.stat.exists
 
         - name: Ensure disable_apparmor = true in CRI plugin
           ansible.builtin.lineinfile:

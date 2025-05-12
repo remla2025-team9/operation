@@ -42,6 +42,8 @@ Each repository has a `README.md` file with information about running. Below is 
 | [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
 | [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
 | [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
+
+
 ## Provision
 
 Start the environment:
@@ -50,14 +52,37 @@ Start the environment:
 vagrant up --provision
 ```
 
-Base Configuration:
+### Environment Variables
+
+The following environment variables can be used to customize the VM configurations:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| WORKER_COUNT_ENV | Number of worker nodes to create | 2 |
+| WORKER_CPU_COUNT_ENV | Number of CPUs for each worker | 2 |
+| WORKER_MEMORY_ENV | Memory (MB) for each worker | 6144 |
+| CONTROLLER_CPU_COUNT_ENV | Number of CPUs for controller | 1 |
+| CONTROLLER_MEMORY_ENV | Memory (MB) for controller | 4096 |
+
+To set all environment variables locally before starting (all values can be changed to match your needs):
+
+```bash
+export WORKER_COUNT_ENV=1
+export WORKER_CPU_COUNT_ENV=1
+export WORKER_MEMORY_ENV=2048
+export CONTROLLER_CPU_COUNT_ENV=1
+export CONTROLLER_MEMORY_ENV=1024
+vagrant up
+```
+
+### Base Configuration
 
 - All VMs use the `bento/ubuntu-24.04` box.
 - VMs are assigned static IPs in the `192.168.56.*` range:
   - Controller node (`ctrl`): `192.168.56.100`
   - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
 
-Ansible Provisioning:
+### Ansible Provisioning
 
 Each VM is further configured using Ansible playbooks:
 

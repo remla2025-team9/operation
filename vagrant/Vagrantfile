@@ -20,11 +20,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Create inventory file on the host machine first
     File.open("inventory.cfg", "w") do |f|
         f.puts "[control]"
-        f.puts "ctrl ansible_host=#{BASE_IP}100 ansible_ssh_user=vagrant ansible_ssh_pass=vagrant"
+        f.puts "ctrl ansible_host=#{BASE_IP}100"
         f.puts ""
         f.puts "[nodes]"
         (1..WORKER_COUNT).each do |i|
-            f.puts "node-#{i} ansible_host=#{BASE_IP}10#{i} ansible_ssh_user=vagrant ansible_ssh_pass=vagrant"
+            f.puts "node-#{i} ansible_host=#{BASE_IP}10#{i}"
         end
     end
 
@@ -70,7 +70,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/general.yaml"
-                # ansible.limit = "node-#{i}"
+                ansible.limit = "node-#{i}"
                 ansible.inventory_path = "inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
@@ -80,7 +80,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
             node.vm.provision "ansible" do |ansible|
                 ansible.playbook = "ansible/node.yaml"
-                #ansible.limit = "node-#{i}"
+                ansible.limit = "node-#{i}"
                 ansible.inventory_path = "inventory.cfg"
                 ansible.extra_vars = {
                     node_id: i,
