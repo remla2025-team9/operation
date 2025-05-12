@@ -1,0 +1,92 @@
+VAGRANTFILE_API_VERSION = "2"
+
+# Number of worker nodes
+WORKER_COUNT = ENV.fetch('WORKER_COUNT_ENV', 2).to_i
+
+# Worker VM resources
+WORKER_CPU_COUNT = ENV.fetch('WORKER_CPU_COUNT_ENV', 2).to_i
+WORKER_MEMORY    = ENV.fetch('WORKER_MEMORY_ENV', 6144).to_i 
+
+# Controller VM resources
+CONTROLLER_CPU_COUNT = ENV.fetch('CONTROLLER_CPU_COUNT_ENV', 1).to_i 
+CONTROLLER_MEMORY    = ENV.fetch('CONTROLLER_MEMORY_ENV', 4096).to_i
+
+BASE_IP = "192.168.56."
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+    config.vm.box = "bento/ubuntu-24.04"
+    config.ssh.insert_key = false
+
+    # Create inventory file on the host machine first
+    File.open("inventory.cfg", "w") do |f|
+        f.puts "[control]"
+        f.puts "ctrl ansible_host=#{BASE_IP}100"
+        f.puts ""
+        f.puts "[nodes]"
+        (1..WORKER_COUNT).each do |i|
+            f.puts "node-#{i} ansible_host=#{BASE_IP}10#{i}"
+        end
+    end
+
+    config.vm.define "ctrl" do |ctrl|
+        ctrl.vm.hostname = "ctrl"
+        ctrl.vm.network "private_network", ip: "#{BASE_IP}100"
+
+        ctrl.vm.provider "virtualbox" do |vb|
+            vb.name = "ctrl"
+            vb.memory = CONTROLLER_MEMORY
+            vb.cpus = CONTROLLER_CPU_COUNT 
+        end
+
+        ctrl.vm.provision "ansible" do |ansible|
+            ansible.playbook = "ansible/general.yaml"
+            ansible.limit = "ctrl"
+            ansible.inventory_path = "inventory.cfg"
+            ansible.extra_vars = {
+                worker_count: WORKER_COUNT
+            }
+        end
+
+        ctrl.vm.provision "ansible" do |ansible|
+            ansible.playbook = "ansible/ctrl.yaml"
+            ansible.limit = "ctrl"
+            ansible.inventory_path = "inventory.cfg"
+            ansible.extra_vars = {
+                worker_count: WORKER_COUNT
+            }
+        end
+    end
+
+    (1..WORKER_COUNT).each do |i|
+        config.vm.define "node-#{i}" do |node|
+            node.vm.hostname = "node-#{i}"
+            node.vm.network "private_network", ip: "#{BASE_IP}10#{i}"
+
+            node.vm.provider "virtualbox" do |vb|
+                vb.name = "node-#{i}"
+                vb.memory = WORKER_MEMORY
+                vb.cpus = WORKER_CPU_COUNT
+            end
+
+            node.vm.provision "ansible" do |ansible|
+                ansible.playbook = "ansible/general.yaml"
+                ansible.limit = "node-#{i}"
+                ansible.inventory_path = "inventory.cfg"
+                ansible.extra_vars = {
+                    node_id: i,
+                    worker_count: WORKER_COUNT
+                }
+            end
+
+            node.vm.provision "ansible" do |ansible|
+                ansible.playbook = "ansible/node.yaml"
+                ansible.limit = "node-#{i}"
+                ansible.inventory_path = "inventory.cfg"
+                ansible.extra_vars = {
+                    node_id: i,
+                    worker_count: WORKER_COUNT
+                }
+            end
+        end
+    end
+end

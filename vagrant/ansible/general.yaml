@@ -1,9 +1,10 @@
 ---
 - hosts: all
   become: yes
-
+  gather_facts: no
+  
   vars:
-    ssh_key_pattern: "{{ playbook_dir }}/../ssh/*.pub"          # relative to your playbook root
+    ssh_key_pattern: "{{ playbook_dir }}/../ssh/*.pub"
 
   tasks:
     - name: Ensure vagrant user exists
@@ -85,7 +86,7 @@
         mode: '0755'
     
     - name: Add signing key for Kubernetes
-      ansible.builtin.api_key:
+      ansible.builtin.apt_key:
         url: https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key
         keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
         state: present
@@ -103,11 +104,75 @@
     
     - name: Install required packages
       ansible.builtin.apt:
-        pkg:
-          - containerd=1.7.24
-          - runc=1.1.12
-          - kubeadm=1.32.4
-          - kubelet=1.32.4
-          - kubectl=1.32.4
+        name:
+          - containerd=1.7.24-0ubuntu1~24.04.2
+          - runc=1.1.12-0ubuntu3.1
+          - kubeadm=1.32.4-1.1
+          - kubelet=1.32.4-1.1
+          - kubectl=1.32.4-1.1
         state: present
         update_cache: yes
+    
+    - name: Configure containerd
+      block: 
+        - name: Check if containerd config exists # When this file exists, we don't need to overwrite it in the next tasks
+          ansible.builtin.stat:
+            path: /etc/containerd/config.toml
+          register: config_file
+
+        - name: Ensure /etc/containerd directory exists
+          ansible.builtin.file:
+            path: /etc/containerd
+            state: directory
+            owner: root
+          when: not config_file.stat.exists
+
+        - name: Get containerd config
+          ansible.builtin.command: containerd config default
+          register: containerd_config
+          check_mode: false
+          when: not config_file.stat.exists
+
+        - name: Write containerd config to /etc/containerd/config.toml
+          ansible.builtin.copy:
+            dest: /etc/containerd/config.toml
+            content: "{{ containerd_config.stdout }}"
+            owner: root
+            group: root
+            mode: '0644'
+          when: not config_file.stat.exists
+
+        - name: Ensure disable_apparmor = true in CRI plugin
+          ansible.builtin.lineinfile:
+            path: /etc/containerd/config.toml
+            regexp: '^(\s*disable_apparmor\s*=\s*)false$' # Now only matches the line with false, could change to be more general
+            line: '\1true'
+            backrefs: yes
+
+        - name: Update sandbox_image in CRI plugin
+          ansible.builtin.lineinfile:
+           path: /etc/containerd/config.toml
+           regexp: '^(\s*sandbox_image\s*=\s*").*(")$'
+           line: '\1registry.k8s.io/pause:3.10\2'
+           backrefs: yes
+
+        - name: Set systemd cgroup driver
+          ansible.builtin.lineinfile:
+            path: /etc/containerd/config.toml
+            regexp: '^(\s*SystemdCgroup\s*=\s*)false$' # Now only matches the line with false, could change to be more general
+            line: '\1true'
+            backrefs: yes
+
+        - name: Restart containerd
+          ansible.builtin.service:
+            name: containerd
+            state: restarted
+            enabled: yes
+      
+    - name: Start and enable Kubelet service
+      ansible.builtin.systemd_service:
+        name: kubelet
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      become: yes
