@@ -23,4 +23,3 @@ spec:
     - hosts:
         - dashboard.k8s.local
       secretName: dashboard-tls
-EOF
