@@ -32,8 +32,8 @@
 - Approved PR:
 
 ### Artin
-- Created PR:
-- Approved PR:
+- Created PR: https://github.com/remla2025-team9/operation/pull/18
+- Approved PR: https://github.com/remla2025-team9/operation/pull/16
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/operation/pull/13
