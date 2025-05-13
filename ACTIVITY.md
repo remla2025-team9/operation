@@ -28,8 +28,8 @@
 - Approved PR: https://github.com/remla2025-team9/operation/pull/14 
 
 ### Raoul
-- Created PR: 
-- Approved PR:
+- Created PR: https://github.com/remla2025-team9/operation/pull/14
+- Approved PR: https://github.com/remla2025-team9/operation/pull/16
 
 ### Artin
 - Created PR: https://github.com/remla2025-team9/operation/pull/18
