@@ -15,14 +15,9 @@
         group: vagrant
         mode: '0644'
 
-    - name: Deploy MetalLB manifest
-      kubernetes.core.k8s:
-        state: present
-        src: https://raw.githubusercontent.com/metallb/metallb/refs/tags/v0.14.9/config/manifests/metallb-native.yaml
-      register: metallb_apply
-      retries: 3
-      delay: 10
-      until: metallb_apply is succeeded
+    - name: Install MetalLB
+      ansible.builtin.command: |
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/refs/tags/v0.14.9/config/manifests/metallb-native.yaml
 
     - name: Wait for MetalLB controller to be ready
       ansible.builtin.command: |
@@ -30,11 +25,10 @@
           --for=condition=ready pod --timeout=120s
 
     - name: Apply MetalLB configuration
-      kubernetes.core.k8s:
-        state: present
-        src: /home/vagrant/yamls/metallb-config.yaml
+      ansible.builtin.command: |
+        kubectl apply -f yamls/metallb-config.yaml
 
-    - name: Add Helm repo: ingress-nginx
+    - name: Add Helm repo ingress-nginx
       kubernetes.core.helm_repository:
         name: ingress-nginx
         url: https://kubernetes.github.io/ingress-nginx
@@ -52,7 +46,7 @@
             service:
               LoadBalancerIP: 192.168.56.90
 
-    - name: Add Helm repo: cert-manager
+    - name: Add Helm repo cert-manager
       kubernetes.core.helm_repository:
         name: jetstack
         url: https://charts.jetstack.io
@@ -68,14 +62,13 @@
         values:
           installCRDs: true
         wait: yes
-        wait_timeout: 300
+        wait_timeout: 300s
 
-    - name: Apply cert-manager Issuers
-      kubernetes.core.k8s:
-        state: present
-        src: /home/vagrant/yamls/cert-manager-issuers.yaml
+    - name: Configure cert-manager issuers
+      ansible.builtin.command: |
+        kubectl apply -f yamls/cert-manager-issuers.yaml
 
-    - name: Add Helm repo: kubernetes-dashboard
+    - name: Add Helm repo kubernetes-dashboard
       kubernetes.core.helm_repository:
         name: kubernetes-dashboard
         url: https://kubernetes.github.io/dashboard/
@@ -89,18 +82,13 @@
         create_namespace: yes
         release_state: present
         wait: yes
-        wait_timeout: 300
+        wait_timeout: 300s
 
     - name: Apply Dashboard RBAC manifest
-      kubernetes.core.k8s:
-        state: present
-        src: /home/vagrant/yamls/dashboard-rbac.yaml
-        wait: yes
-        wait_timeout: 60
+      ansible.builtin.command: |
+          kubectl apply -f yamls/dashboard-rbac.yaml
+
 
     - name: Apply Dashboard Ingress manifest
-      kubernetes.core.k8s:
-        state: present
-        src: /home/vagrant/yamls/dashboard-ingress.yaml
-        wait: yes
-        wait_timeout: 60
+      ansible.builtin.command: |
+          kubectl apply -f yamls/dashboard-ingress.yaml
