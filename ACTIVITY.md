@@ -40,5 +40,5 @@
 - Approved PR: https://github.com/remla2025-team9/operation/pull/14
   
 ### Lucian
-- Created PR:
-- Approved PR:
+- Created PR: https://github.com/remla2025-team9/operation/pull/17
+- Approved PR: https://github.com/remla2025-team9/operation/pull/13
