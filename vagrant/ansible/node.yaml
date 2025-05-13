@@ -14,4 +14,4 @@
           ansible_become: yes 
 
     - name: Join worker nodes to the Kubernetes cluster
-      ansible.builtin.shell: "{{ hostvars[groups['control'][0]]['kubeadm_join_command']['stdout'] }}"
+      ansible.builtin.shell: " {{ kubeadm_join_command.stdout }} "

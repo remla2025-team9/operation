@@ -98,10 +98,6 @@
         filename: kubernetes-community
         state: present
     
-    - name: Refresh APT cache
-      ansible.builtin.apt:
-        update_cache: yes
-    
     - name: Install required packages
       ansible.builtin.apt:
         name:

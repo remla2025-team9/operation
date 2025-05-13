@@ -1,6 +1,87 @@
-- name: Setup Kubernetes controller node
-  hosts: all
+---
+- hosts: control
   become: yes
 
+  environment:
+    KUBECONFIG: /home/vagrant/.kube/config
 
+  tasks:
+    - name: Check if kubeconfig exists
+      ansible.builtin.stat:
+        path: /etc/kubernetes/admin.conf
+      register: kubeconfig_file
+
+    - name: Generate kubeadm init command
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/kubeadm
+          - init
+          - --pod-network-cidr=10.244.0.0/16
+          - --node-name={{ ansible_hostname }}
+          - --apiserver-advertise-address={{ ansible_host }}
+      when: not kubeconfig_file.stat.exists
+
+    - name: Ensure .kube directory exists
+      ansible.builtin.file:
+        path: /home/vagrant/.kube
+        state: directory
+        mode: '0755'
+
+    - name: Copy kubeconfig
+      ansible.builtin.copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        remote_src: yes
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+    - name: Fetch kubeconfig to local machine
+      ansible.builtin.fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: ../../config/.kubeconfig
+        flat: yes
+
+    - name: Copy configuration files
+      ansible.builtin.copy:
+        src: yamls/
+        dest: /home/vagrant/yamls/
+        remote_src: no
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+    - name: Install Flannel network plugin
+      ansible.builtin.command: |
+        kubectl apply -f /home/vagrant/yamls/kube-flannel.yml
+
+    - name: Add signing key for Helm
+      ansible.builtin.apt_key:
+        url: https://baltocdn.com/helm/signing.asc
+        keyring: /etc/apt/keyrings/helm-apt-keyring.gpg
+        state: present
+
+    - name: Install Helm apt repository
+      ansible.builtin.apt_repository:
+        repo: >-
+          deb [signed-by=/etc/apt/keyrings/helm-apt-keyring.gpg] https://baltocdn.com/helm/stable/debian/ all main
+        filename: helm-stable-debian
+        state: present
+
+    - name: Install Helm
+      ansible.builtin.apt:
+        name:
+          - helm=3.17.3-1
+        state: present
+        update_cache: yes
+
+    - name: Check if Helm diff plugin is installed
+      ansible.builtin.command: helm plugin list
+      register: helm_plugin_list
+      changed_when: false
+
+    - name: Install Helm Diff
+      kubernetes.core.helm_plugin:
+        plugin_path: "https://github.com/databus23/helm-diff"
+        state: present
 

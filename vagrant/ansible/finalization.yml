@@ -1,0 +1,66 @@
+---
+- hosts: all
+  environment:
+      KUBECONFIG: /home/vagrant/.kube/config
+
+  tasks:
+    - name: Copy configuration files
+      ansible.builtin.copy:
+        src: yamls/
+        dest: /home/vagrant/yamls/
+        remote_src: no
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+    - name: Install MetalLB
+      ansible.builtin.command: |
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/refs/tags/v0.14.9/config/manifests/metallb-native.yaml
+
+    - name: Wait for MetalLB controller to be ready
+      ansible.builtin.command: |
+        kubectl wait -n metallb-system -l app=metallb,component=controller --for=condition=ready pod --timeout=60s
+
+    - name: Apply MetalLB configuration
+      ansible.builtin.command: |
+        kubectl apply -f yamls/metallb-config.yaml
+
+    - name: Add Helm repository for NGINX Ingress Controller
+      kubernetes.core.helm_repository:
+        name: ingress-nginx
+        url: https://kubernetes.github.io/ingress-nginx
+
+    - name: Install NGINX Ingress Controller
+      kubernetes.core.helm:
+        update_repo_cache: true
+        release_name: ingress-nginx
+        chart_ref: "ingress-nginx/ingress-nginx"
+        release_namespace: ingress-nginx
+        create_namespace: yes
+        release_state: present
+        values:
+          controller:
+            service:
+              LoadBalancerIP: 192.168.56.90
+
+    - name: Add Helm repository for cert-manager
+      kubernetes.core.helm_repository:
+        name: jetstack
+        url: https://charts.jetstack.io
+
+    - name: Install cert-manager
+      kubernetes.core.helm:
+        update_repo_cache: true
+        release_name: cert-manager
+        chart_ref: "jetstack/cert-manager"
+        release_namespace: cert-manager
+        create_namespace: yes
+        release_state: present
+        values:
+          installCRDs: true
+        wait: true
+
+    - name: Configure cert-manager issuers
+      ansible.builtin.command: |
+          kubectl apply -f yamls/cert-manager-issuers.yaml
+
