@@ -1,0 +1,27 @@
+cat <<EOF > yamls/dashboard-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard-ingress
+  namespace: kubernetes-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: dashboard.k8s.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kubernetes-dashboard-kong-proxy
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - dashboard.k8s.local
+      secretName: dashboard-tls
+EOF
