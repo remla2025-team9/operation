@@ -92,3 +92,21 @@ Each VM is further configured using Ansible playbooks:
 - **Worker nodes (`node-X`)** run:
   - `ansible/general.yaml`
   - `ansible/node.yaml`
+
+To spin up the VMs, make sure to be in the '/vagrant' directory and run:
+
+```bash
+vagrant up
+```
+
+After the Kubernetes cluster is up, the installation can be finalized by running the following command in the `/vagrant/ansible` directory:
+
+```bash
+ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
+```
+
+Afterwards, you can find the kubernetes configuration file in `config/.kubeconfig`. You can use this file to connect to the Kubernetes cluster from your local machine. Make sure to set the `KUBECONFIG` environment variable to point to this file:
+
+```bash
+kubectl --kubeconfig config/.kubeconfig ...
+```
