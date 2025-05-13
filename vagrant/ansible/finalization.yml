@@ -1,7 +1,9 @@
 ---
 - hosts: all
+  become: yes
+  gather_facts: no
   environment:
-      KUBECONFIG: /home/vagrant/.kube/config
+    KUBECONFIG: /home/vagrant/.kube/config
 
   tasks:
     - name: Copy configuration files
@@ -13,19 +15,26 @@
         group: vagrant
         mode: '0644'
 
-    - name: Install MetalLB
-      ansible.builtin.command: |
-        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/refs/tags/v0.14.9/config/manifests/metallb-native.yaml
+    - name: Deploy MetalLB manifest
+      kubernetes.core.k8s:
+        state: present
+        src: https://raw.githubusercontent.com/metallb/metallb/refs/tags/v0.14.9/config/manifests/metallb-native.yaml
+      register: metallb_apply
+      retries: 3
+      delay: 10
+      until: metallb_apply is succeeded
 
     - name: Wait for MetalLB controller to be ready
       ansible.builtin.command: |
-        kubectl wait -n metallb-system -l app=metallb,component=controller --for=condition=ready pod --timeout=60s
+        kubectl wait -n metallb-system -l app=metallb,component=controller \
+          --for=condition=ready pod --timeout=120s
 
     - name: Apply MetalLB configuration
-      ansible.builtin.command: |
-        kubectl apply -f yamls/metallb-config.yaml
+      kubernetes.core.k8s:
+        state: present
+        src: /home/vagrant/yamls/metallb-config.yaml
 
-    - name: Add Helm repository for NGINX Ingress Controller
+    - name: Add Helm repo: ingress-nginx
       kubernetes.core.helm_repository:
         name: ingress-nginx
         url: https://kubernetes.github.io/ingress-nginx
@@ -34,7 +43,7 @@
       kubernetes.core.helm:
         update_repo_cache: true
         release_name: ingress-nginx
-        chart_ref: "ingress-nginx/ingress-nginx"
+        chart_ref: ingress-nginx/ingress-nginx
         release_namespace: ingress-nginx
         create_namespace: yes
         release_state: present
@@ -43,7 +52,7 @@
             service:
               LoadBalancerIP: 192.168.56.90
 
-    - name: Add Helm repository for cert-manager
+    - name: Add Helm repo: cert-manager
       kubernetes.core.helm_repository:
         name: jetstack
         url: https://charts.jetstack.io
@@ -52,15 +61,79 @@
       kubernetes.core.helm:
         update_repo_cache: true
         release_name: cert-manager
-        chart_ref: "jetstack/cert-manager"
+        chart_ref: jetstack/cert-manager
         release_namespace: cert-manager
         create_namespace: yes
         release_state: present
         values:
           installCRDs: true
-        wait: true
+        wait: yes
+        wait_timeout: 300
 
-    - name: Configure cert-manager issuers
-      ansible.builtin.command: |
-          kubectl apply -f yamls/cert-manager-issuers.yaml
+    - name: Apply cert-manager Issuers
+      kubernetes.core.k8s:
+        state: present
+        src: /home/vagrant/yamls/cert-manager-issuers.yaml
 
+    - name: Add Helm repo: kubernetes-dashboard
+      kubernetes.core.helm_repository:
+        name: kubernetes-dashboard
+        url: https://kubernetes.github.io/dashboard/
+
+    - name: Install Kubernetes Dashboard
+      kubernetes.core.helm:
+        update_repo_cache: true
+        release_name: kubernetes-dashboard
+        chart_ref: kubernetes-dashboard/kubernetes-dashboard
+        release_namespace: kubernetes-dashboard
+        create_namespace: yes
+        release_state: present
+        wait: yes
+        wait_timeout: 300
+
+    - name: Apply Dashboard RBAC manifest
+      kubernetes.core.k8s:
+        state: present
+        src: /home/vagrant/yamls/dashboard-rbac.yaml
+        wait: yes
+        wait_timeout: 60
+
+    - name: Write Dashboard Ingress manifest
+      ansible.builtin.copy:
+        dest: /home/vagrant/yamls/dashboard-ingress.yaml
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+        content: |
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: kubernetes-dashboard-ingress
+            namespace: kubernetes-dashboard
+            annotations:
+              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+              cert-manager.io/cluster-issuer: "selfsigned-cluster-issuer"
+          spec:
+            ingressClassName: nginx
+            rules:
+              - host: dashboard.k8s.local
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: kubernetes-dashboard-kong-proxy
+                          port:
+                            number: 443
+            tls:
+              - hosts:
+                  - dashboard.k8s.local
+                secretName: dashboard-tls
+
+    - name: Apply Dashboard Ingress manifest
+      kubernetes.core.k8s:
+        state: present
+        src: /home/vagrant/yamls/dashboard-ingress.yaml
+        wait: yes
+        wait_timeout: 60
