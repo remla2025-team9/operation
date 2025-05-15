@@ -1,8 +1,8 @@
 # Operation
 
-This repository helps connect and run the services developed by REMLA 2025 Team 9. It uses Docker Compose to start everything locally for testing or demonstration purposes.
+This repository helps connect and run the services developed by REMLA 2025 Team 9. The application can be run either using Docker Compose locally or deployed to a Kubernetes cluster using Minikube and Helm.
 
-## How to Start
+## Option 1: Running with Docker Compose
 
 Make sure Docker and Docker Compose are installed. Then:
 
@@ -36,6 +36,76 @@ If you're using GitHub Container Registry (GHCR) images and encounter permission
 echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
 
+## Option 2: Running with Minikube and Helm
+
+### Prerequisites
+- Minikube
+- Helm
+- kubectl
+
+### Setup steps
+
+1. Start Minikube with appropriate resources:
+```bash
+minikube start --cpus 2 --memory 2048 --driver=docker
+```
+
+2. Navigate to the Helm chart directory:
+```bash
+cd app-helm-chart
+```
+
+3. Install the application:
+```bash
+# Update dependencies first
+helm dependency update
+# Install the chart (optionally modify values.yaml first)
+helm install my-app .
+```
+
+4. (Optional) Access the frontend:
+```bash
+# Start minikube tunnel in a separate terminal
+minikube tunnel
+
+# Get the external IP (NGINX Controller)
+kubectl get services -n ingress-nginx
+# Use the EXTERNAL-IP from ingress-nginx-controller on port 80 or the specified port in app-helm-chart/values.yaml
+```
+
+### Useful kubectl commands when the cluster is running
+
+Monitor the deployment:
+```bash
+# Get all pods
+kubectl get pods
+
+# Get all services
+kubectl get services
+
+# Get ingress details
+kubectl get ingress
+
+# View pod logs
+kubectl logs -l app=app-frontend
+kubectl logs -l app=app-service
+kubectl logs -l app=model-service
+
+# Describe resources for troubleshooting
+kubectl describe pod <pod-name>
+kubectl describe service <service-name>
+kubectl describe ingress <ingress-name>
+```
+
+Clean up:
+```bash
+# Uninstall the application
+helm uninstall my-app
+
+# Stop minikube
+minikube stop
+```
+
 ---
 
 ## Repositories
@@ -61,7 +131,7 @@ Start the environment:
 vagrant up --provision
 ```
 
-### Environment Variables
+### Environment variables
 
 The following environment variables can be used to customize the VM configurations:
 
@@ -84,14 +154,14 @@ export CONTROLLER_MEMORY_ENV=1024
 vagrant up
 ```
 
-### Base Configuration
+### Base configuration
 
 - All VMs use the `bento/ubuntu-24.04` box.
 - VMs are assigned static IPs in the `192.168.56.*` range:
   - Controller node (`ctrl`): `192.168.56.100`
   - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
 
-### Ansible Provisioning
+### Ansible provisioning
 
 Each VM is further configured using Ansible playbooks:
 
