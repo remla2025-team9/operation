@@ -19,7 +19,7 @@ services:
     secrets:
       - example-secret
 
-  frontend:
+  app-frontend:
     image: ghcr.io/remla2025-team9/app-frontend:latest
     ports:
       - "3000:3000"

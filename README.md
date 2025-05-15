@@ -11,14 +11,23 @@ Configure the env files for each service:
 * app-frontend.env
 * model-service.env
 
+To use the default configurations, copy the example files:
+
 ```bash
-docker-compose up -d
+cp app-service.env.example app-service.env
+cp app-frontend.env.example app-frontend.env
+cp model-service.env.example model-service.env
+```
+
+Start the services:
+```bash
+docker compose up -d
 ```
 
 To stop the services:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 If you're using GitHub Container Registry (GHCR) images and encounter permission errors, log in first:
