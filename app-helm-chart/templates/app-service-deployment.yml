@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-service-config
+  labels:
+    app: app-service
+data:
+  {{- range $key, $val := .Values.appService.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-deployment
+  labels:
+    app: app-service
+spec:
+  replicas: {{ .Values.appService.replicas }}
+  selector:
+    matchLabels:
+      app: app-service
+  template:
+    metadata:
+      labels:
+        app: app-service
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: app-service
+          image: "{{ .Values.appService.image.repository }}:{{ .Values.appService.image.tag }}"
+          imagePullPolicy: {{ .Values.appService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appService.port }}
+          envFrom:
+            - configMapRef:
+                name: app-service-config
