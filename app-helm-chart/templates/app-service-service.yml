@@ -5,9 +5,8 @@ metadata:
   labels:
     app: app-service
 spec:
-  # type: ClusterIP
   ports:
-    - port: {{ .Values.appService.port }}
+    - port: {{ .Values.appService.service.port }}
       targetPort: {{ .Values.appService.port }}
   selector:
     app: app-service

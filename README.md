@@ -65,12 +65,10 @@ helm install my-app .
 
 4. (Optional) Access the frontend:
 ```bash
-# Start minikube tunnel in a separate terminal
-minikube tunnel
+# Start minikube tunnel in a separate terminal and bind it to "localhost"
+minikube tunnel --bind-address "127.0.0.1"
 
-# Get the external IP (NGINX Controller)
-kubectl get services -n ingress-nginx
-# Use the EXTERNAL-IP from ingress-nginx-controller on port 80 or the specified port in app-helm-chart/values.yaml
+# After running the tunnel, the app should be accessible on "localhost"
 ```
 
 ### Useful kubectl commands when the cluster is running

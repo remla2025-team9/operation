@@ -16,7 +16,7 @@ metadata:
   labels:
     app: app-frontend
 spec:
-  replicas: 1
+  replicas: {{ .Values.appFrontend.replicas }}
   selector:
     matchLabels:
       app: app-frontend

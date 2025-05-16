@@ -1,6 +1,8 @@
 services:
   app-service:
     image: ghcr.io/remla2025-team9/app-service:latest
+    ports:
+      - "5000:5000"
     env_file:
       - app-service.env
     depends_on:

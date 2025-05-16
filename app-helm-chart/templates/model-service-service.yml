@@ -5,7 +5,6 @@ metadata:
   labels:
     app: model-service
 spec:
-  # type: ClusterIP
   ports:
     - port: {{ .Values.modelService.port }}
       targetPort: {{ .Values.modelService.port }}
