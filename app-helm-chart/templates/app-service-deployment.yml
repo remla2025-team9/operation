@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-service-config
   labels:
-    app: app-service
+    app: {{ include "app-helm-chart.fullname" . }}-app-service
 data:
   {{- range $key, $val := .Values.appService.config }}
   {{ $key }}: {{ $val | quote }}
@@ -12,18 +12,18 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-deployment
+  name: {{ include "app-helm-chart.fullname" . }}-app-service-deployment
   labels:
-    app: app-service
+    app: {{ include "app-helm-chart.fullname" . }}-app-service
 spec:
   replicas: {{ .Values.appService.replicas }}
   selector:
     matchLabels:
-      app: app-service
+      app: {{ include "app-helm-chart.fullname" . }}-app-service
   template:
     metadata:
       labels:
-        app: app-service
+        app: {{ include "app-helm-chart.fullname" . }}-app-service
     spec:
       restartPolicy: Always
       containers:

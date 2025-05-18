@@ -55,12 +55,16 @@ minikube start --cpus 2 --memory 2048 --driver=docker
 cd app-helm-chart
 ```
 
-3. Install the application:
+3. Install or upgrade the application:
 ```bash
 # Update dependencies first
 helm dependency update
-# Install the chart (optionally modify values.yaml first)
-helm install my-app .
+
+# Install or upgrade the chart
+helm upgrade --install my-app . \
+  --namespace default \
+  --set appFrontend.ingress.host=localhost \
+  --set appService.ingress.host=localhost
 ```
 
 4. (Optional) Access the frontend:
