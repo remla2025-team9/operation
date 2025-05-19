@@ -11,23 +11,3 @@ spec:
       name: http
   selector:
     app: app-service
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: app-service-servicemonitor
-  namespace: monitoring
-  labels:
-    app: app-service
-    release: prometheus
-spec:
-  selector:
-    matchLabels:
-      app: app-service
-  namespaceSelector:
-    matchNames:
-      - {{ .Release.Namespace }}
-  endpoints:
-    - port: http
-      path: /metrics
-      interval: 30s
