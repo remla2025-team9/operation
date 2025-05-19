@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "app-helm-chart.fullname" . }}-app-frontend-ingress
+  name: {{ .Release.Name }}-app-frontend-ingress
   labels:
-    app: {{ include "app-helm-chart.fullname" . }}-app-frontend
+    app: {{ .Release.Name }}-app-frontend
 spec:
   ingressClassName: nginx
   rules:
@@ -14,6 +14,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ include "app-helm-chart.fullname" . }}-app-frontend
+                name: {{ .Release.Name }}-app-frontend
                 port:
                   number: {{ .Values.appFrontend.service.port }}
