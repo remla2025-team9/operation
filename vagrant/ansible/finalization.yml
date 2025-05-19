@@ -92,3 +92,58 @@
     - name: Apply Dashboard Ingress manifest
       ansible.builtin.command: |
           kubectl apply -f yamls/dashboard-ingress.yaml
+
+    - name: Download Istio 1.25.2 tarball
+      become_user: vagrant
+      ansible.builtin.get_url:
+        url: https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-amd64.tar.gz
+        dest: /home/vagrant/istio.tar.gz
+        mode: '0644'
+
+    - name: Extract Istio archive
+      become_user: vagrant
+      ansible.builtin.unarchive:
+        src: /home/vagrant/istio.tar.gz
+        dest: /home/vagrant/
+        remote_src: yes
+
+    - name: Create IstioOperator custom config file
+      become_user: vagrant
+      ansible.builtin.copy:
+        dest: /tmp/istio-config.yaml
+        mode: '0644'
+        content: |
+          apiVersion: install.istio.io/v1alpha1
+          kind: IstioOperator
+          spec:
+            components:
+              ingressGateways:
+              - name: istio-ingressgateway
+                enabled: true
+                k8s:
+                  service:
+                    ports:
+                    - name: http2
+                      port: 80
+                      targetPort: 8080
+                    - name: https
+                      port: 443
+                      targetPort: 8443
+                    loadBalancerIP: 192.168.56.91
+
+    - name: Install Istio using istioctl and custom config
+      become_user: vagrant
+      ansible.builtin.command: |
+        /home/vagrant/istio-1.25.2/bin/istioctl install -y -f /tmp/istio-config.yaml
+      environment:
+        PATH: "/home/vagrant/istio-1.25.2/bin:{{ ansible_env.PATH }}"
+
+    - name: Enable automatic sidecar injection in default namespace
+      become_user: vagrant
+      ansible.builtin.command: |
+        kubectl label namespace default istio-injection=enabled --overwrite
+
+    - name: Wait for Istio pods to be ready
+      become_user: vagrant
+      ansible.builtin.command: |
+        kubectl wait --for=condition=ready pod --all -n istio-system --timeout=120s
