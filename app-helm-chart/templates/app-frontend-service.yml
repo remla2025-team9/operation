@@ -8,5 +8,6 @@ spec:
   ports:
     - port: {{ .Values.appFrontend.service.port }}
       targetPort: {{ .Values.appFrontend.port }}
+      name: http
   selector:
     app: app-frontend
