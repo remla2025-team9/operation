@@ -46,3 +46,7 @@ appFrontend:
     host: "app.k8s.local"
   config:
     APP_SERVICE_URL: "/app-service"
+
+appSecret:
+  enabled: true
+  apiKey: "top_secret_message_of_team_9"

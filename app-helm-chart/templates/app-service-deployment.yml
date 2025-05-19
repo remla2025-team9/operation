@@ -35,3 +35,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: app-service-config
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-app-secret
+                  key: API_KEY
