@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-app-frontend-ingress
+  name: app-frontend-ingress
   labels:
-    app: {{ .Release.Name }}-app-frontend
+    app: app-frontend
 spec:
   ingressClassName: nginx
   rules:
@@ -14,6 +14,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ .Release.Name }}-app-frontend
+                name: app-frontend
                 port:
                   number: {{ .Values.appFrontend.service.port }}

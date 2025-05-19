@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app-service-servicemonitor
+  namespace: monitoring
+  labels:
+    app: app-service
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: app-service
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+---
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: reviews-submitted-alert
+  namespace: monitoring
+  labels:
+    app: app-service
+    release: prometheus
+spec:
+  groups:
+    - name: reviews-submitted.rules
+      rules:
+        - alert: ReviewsSubmittedHigh
+          expr: increase(reviews_submitted_total[5m]) > 5
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High number of reviews submitted"
+            description: "More than 5 reviews have been submitted in the last 5 minutes."
