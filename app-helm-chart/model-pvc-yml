@@ -2,11 +2,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: model-cache-pvc
-  labels:
-    app: model-service
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.modelService.persistence.size }}
+      storage: 1Gi
