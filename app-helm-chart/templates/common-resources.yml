@@ -10,3 +10,17 @@ spec:
   resources:
     requests:
       storage: {{ .Values.modelService.persistence.size }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: model-cache-pv
+  labels:
+    app: model-service
+spec:
+  capacity:
+    storage: {{ .Values.modelService.persistence.size }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data/model-cache

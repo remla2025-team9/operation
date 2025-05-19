@@ -20,12 +20,12 @@ appService:
   image:
     repository: ghcr.io/remla2025-team9/app-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   port: 5000
   service:
     port: 80
   ingress: 
-    host: "localhost"
+    host: "app.k8s.local"
   config:
     MODEL_SERVICE_URL: "http://model-service:5001"
     FLASK_ENV: "production"
@@ -43,6 +43,6 @@ appFrontend:
   service:
     port: 80 # Service port for Ingress to target
   ingress:
-    host: "localhost"
+    host: "app.k8s.local"
   config:
     APP_SERVICE_URL: "/app-service"
