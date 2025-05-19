@@ -63,5 +63,5 @@
 - Approved PR: https://github.com/remla2025-team9/operation/pull/19
   
 ### Lucian
-- Created PR: x
-- Approved PR: x
+- Created PR: https://github.com/remla2025-team9/operation/pull/26
+- Approved PR: https://github.com/remla2025-team9/app-service/pull/10
