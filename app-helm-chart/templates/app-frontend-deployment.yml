@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: app-frontend-config
   labels:
-    app: app-frontend
+    app: {{ include "app-helm-chart.fullname" . }}-app-frontend
 data:
   {{- range $key, $val := .Values.appFrontend.config }}
   {{ $key }}: {{ $val | quote }}
@@ -12,18 +12,18 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-frontend-deployment
+  name: {{ include "app-helm-chart.fullname" . }}-app-frontend-deployment
   labels:
-    app: app-frontend
+    app: {{ include "app-helm-chart.fullname" . }}-app-frontend
 spec:
   replicas: {{ .Values.appFrontend.replicas }}
   selector:
     matchLabels:
-      app: app-frontend
+      app: {{ include "app-helm-chart.fullname" . }}-app-frontend
   template:
     metadata:
       labels:
-        app: app-frontend
+        app: {{ include "app-helm-chart.fullname" . }}-app-frontend
     spec:
       restartPolicy: Always
       containers:

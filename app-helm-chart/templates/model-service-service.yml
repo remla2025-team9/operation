@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: model-service
+  name: {{ include "app-helm-chart.fullname" . }}-model-service
   labels:
-    app: model-service
+    app: {{ include "app-helm-chart.fullname" . }}-model-service
 spec:
   ports:
     - port: {{ .Values.modelService.port }}
       targetPort: {{ .Values.modelService.port }}
   selector:
-    app: model-service
+    app: {{ include "app-helm-chart.fullname" . }}-model-service
