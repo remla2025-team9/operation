@@ -1,4 +1,3 @@
-# model-service settings
 modelService:
   replicas: 1
   image:
@@ -10,11 +9,9 @@ modelService:
     MODEL_VERSION: "v0.0.3-pre.0"
     SERVICE_PORT: "5001"
     SERVICE_HOST: "0.0.0.0"
-  # secretName: example-secret
   persistence:
     size: 1Gi
 
-# app-service settings
 appService:
   replicas: 1
   image:
@@ -32,17 +29,20 @@ appService:
     FLASK_RUN_HOST: "0.0.0.0"
     FLASK_RUN_PORT: "5000"
 
-# app-frontend settings
 appFrontend:
   replicas: 1
   image:
     repository: ghcr.io/remla2025-team9/app-frontend
     tag: latest
     pullPolicy: IfNotPresent
-  port: 3000 # Internal port the container listens on
+  port: 3000
   service:
-    port: 80 # Service port for Ingress to target
+    port: 80
   ingress:
     host: "localhost"
   config:
     APP_SERVICE_URL: "/app-service"
+
+appSecret:
+  enabled: true
+  apiKey: "top_secret_message_of_team_9"
