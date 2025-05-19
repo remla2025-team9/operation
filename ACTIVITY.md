@@ -60,7 +60,7 @@
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/operation/pull/24
-- Approved PR: https://github.com/remla2025-team9/operation/pull/19
+- Approved PR: https://github.com/remla2025-team9/operation/pull/26
   
 ### Lucian
 - Created PR: https://github.com/remla2025-team9/operation/pull/26
