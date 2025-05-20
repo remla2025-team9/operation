@@ -196,7 +196,7 @@ helm upgrade --install --namespace application --create-namespace restaurant-rev
 
 ### Installing Prometheus with Helm
 
-Before installing Prometheus, ensure the `prometheus-community` Helm repository is added to your local Helm setup.
+Ensure the `prometheus-community` Helm repository is added to your local Helm setup:
 
 Run:
 
