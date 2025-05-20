@@ -208,17 +208,11 @@ Look for prometheus-community in the list. If it’s not there, add it with:
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts/
-```
 
-Update Helm repositories:
-
-```bash
+# Update Helm repositories:
 helm repo update
-```
 
-Install the Prometheus Kube-Prometheus-Stack chart:
-
-```bash
+# Install the Prometheus Kube-Prometheus-Stack chart:
 helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
 ```
 
