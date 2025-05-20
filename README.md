@@ -188,14 +188,43 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 kubectl --kubeconfig config/.kubeconfig ...
 ```
 
-## Manual Installation of Grafana Dashboard
+Install the application by running:
 
+```bash
+helm upgrade --install --namespace application --create-namespace restaurant-review ./app-helm-chart
+```
+
+### Installing Prometheus with Helm
+
+Before installing Prometheus, ensure the `prometheus-community` Helm repository is added to your local Helm setup.
+
+Run:
+
+```bash
+helm repo list
+```
+
+Look for prometheus-community in the list. If it’s not there, add it with:
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts/
+```
+
+Update Helm repositories:
+
+```bash
+helm repo update
+```
+
+Install the Prometheus Kube-Prometheus-Stack chart:
+
+```bash
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
+```
+
+### Manual Installation of Grafana Dashboard
 
 ## 1. Access Grafana UI
-
-- If you are running your stack with Minikube and Helm:
-
-  Ensure the frontend is accessible, for example, by using `minikube tunnel` or port forwarding.
 
 - Using `kubectl port-forward`:
 
@@ -222,4 +251,3 @@ kubectl --kubeconfig config/.kubeconfig ...
 - Click on the **New** icon in the top right.
 - Choose **"Import"**.
 - Upload the dashboard JSON file provided with this project or paste the JSON content directly.
-- Select the correct Prometheus data source (usually auto-detected if named `Prometheus`).
