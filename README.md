@@ -190,12 +190,25 @@ kubectl --kubeconfig config/.kubeconfig ...
 
 ## Manual Installation of Grafana Dashboard
 
-If you want to manually install and import the pre-configured Grafana dashboard for monitoring your application, follow these steps:
 
 ## 1. Access Grafana UI
 
-- If you are running your stack with Minikube and Helm, ensure the frontend is accessible (e.g., via `minikube tunnel` or port forwarding).
-- Open your browser and navigate to the Grafana URL (usually `http://localhost`).
+- If you are running your stack with Minikube and Helm:
+
+  Ensure the frontend is accessible, for example, by using `minikube tunnel` or port forwarding.
+
+- Using `kubectl port-forward`:
+
+  Run the following command to forward a local port to the Grafana service port:
+
+  ```bash
+  kubectl port-forward -n monitoring svc/prometheus-grafana 1234:80
+  ```
+
+- Navigate to:
+
+  http://localhost:1234
+
 
 ## 2. Log in to Grafana
 
@@ -205,7 +218,8 @@ If you want to manually install and import the pre-configured Grafana dashboard 
 
 ## 3. Import the Dashboard JSON
 
-- Click on the **"+"** icon in the left sidebar.
+- Go to the **Dashboards** in the left bar.
+- Click on the **New** icon in the top right.
 - Choose **"Import"**.
 - Upload the dashboard JSON file provided with this project or paste the JSON content directly.
 - Select the correct Prometheus data source (usually auto-detected if named `Prometheus`).
