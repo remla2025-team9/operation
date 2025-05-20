@@ -188,7 +188,7 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 kubectl --kubeconfig config/.kubeconfig ...
 ```
 
-Install the application by running:
+### Install the application 
 
 ```bash
 helm upgrade --install --namespace application --create-namespace restaurant-review ./app-helm-chart
