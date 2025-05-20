@@ -187,3 +187,25 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 ```bash
 kubectl --kubeconfig config/.kubeconfig ...
 ```
+
+## Manual Installation of Grafana Dashboard
+
+If you want to manually install and import the pre-configured Grafana dashboard for monitoring your application, follow these steps:
+
+## 1. Access Grafana UI
+
+- If you are running your stack with Minikube and Helm, ensure the frontend is accessible (e.g., via `minikube tunnel` or port forwarding).
+- Open your browser and navigate to the Grafana URL (usually `http://localhost`).
+
+## 2. Log in to Grafana
+
+- Use the default credentials (if set by your Helm chart or Docker Compose):
+  - Username: `admin`
+  - Password: `prom-operator` (or check your environment variables/configuration)
+
+## 3. Import the Dashboard JSON
+
+- Click on the **"+"** icon in the left sidebar.
+- Choose **"Import"**.
+- Upload the dashboard JSON file provided with this project or paste the JSON content directly.
+- Select the correct Prometheus data source (usually auto-detected if named `Prometheus`).
