@@ -254,32 +254,18 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 kubectl --kubeconfig config/.kubeconfig ...
 ```
 
-### Install the application 
+### Check Prometheus and Grafana with Helm
 
-```bash
-helm upgrade --install --namespace application --create-namespace restaurant-review ./app-helm-chart
-```
-
-### Installing Prometheus with Helm
-
-Ensure the `prometheus-community` Helm repository is added to your local Helm setup:
-
-Run:
+Ensure the `prometheus-community` Helm repository is added to your local Helm setup, check it by running:
 
 ```bash
 helm repo list
 ```
 
-Look for prometheus-community in the list. If it’s not there, add it with:
+Ensure `my-app-grafana` in the pod, check it by running:
 
 ```bash
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts/
-
-# Update Helm repositories:
-helm repo update
-
-# Install the Prometheus Kube-Prometheus-Stack chart:
-helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
+kubectl get svc -n default
 ```
 
 ### Accessing Grafana Dashboard in Minikube
