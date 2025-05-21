@@ -282,32 +282,24 @@ helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace
 ```
 
-### Manual Installation of Grafana Dashboard
+### Accessing Grafana Dashboard in Minikube
 
-## 1. Access Grafana UI
+1. Access Grafana UI using port forwarding:
+```bash
+kubectl port-forward -n default svc/my-app-grafana 1234:80
+```
 
-- Using `kubectl port-forward`:
+- Navigate to: http://localhost:1234
 
-  Run the following command to forward a local port to the Grafana service port:
-
-  ```bash
-  kubectl port-forward -n monitoring svc/prometheus-grafana 1234:80
-  ```
-
-- Navigate to:
-
-  http://localhost:1234
-
-
-## 2. Log in to Grafana
-
-- Use the default credentials (if set by your Helm chart or Docker Compose):
+2. Log in to Grafana
+- Default credentials:
   - Username: `admin`
-  - Password: `prom-operator` (or check your environment variables/configuration)
+  - Password: `prom-operator` (for kubernetes cluster deployment)
 
-## 3. Import the Dashboard JSON
+Note: The port number (1234) can be changed to any available port on your local machine.
 
-- Go to the **Dashboards** in the left bar.
-- Click on the **New** icon in the top right.
-- Choose **"Import"**.
-- Upload the dashboard JSON file provided with this project or paste the JSON content directly.
+3. Import the Dashboard
+- In the Grafana UI:
+  1. Go to **Dashboards** in the left sidebar
+  2. Click **New** → **Import**
+  3. Upload the dashboard JSON file or paste the JSON content
