@@ -18,13 +18,13 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 29,
+  "id": 1,
   "links": [],
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "femerkbw1lla8f"
+        "uid": "aemkvy2gx1r0gb"
       },
       "fieldConfig": {
         "defaults": {
@@ -105,7 +105,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "femerkbw1lla8f"
+            "uid": "aemkvy2gx1r0gb"
           },
           "editorMode": "code",
           "expr": "rate(reviews_submitted_total[10h])",
@@ -120,7 +120,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "femerkbw1lla8f"
+        "uid": "aemkvy2gx1r0gb"
       },
       "fieldConfig": {
         "defaults": {
@@ -182,7 +182,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "femerkbw1lla8f"
+            "uid": "aemkvy2gx1r0gb"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.95, sum(rate(predictions_latency_seconds_bucket[5h])) by (le))",
@@ -197,7 +197,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "femerkbw1lla8f"
+        "uid": "aemkvy2gx1r0gb"
       },
       "fieldConfig": {
         "defaults": {
@@ -247,7 +247,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "femerkbw1lla8f"
+            "uid": "aemkvy2gx1r0gb"
           },
           "editorMode": "code",
           "expr": "avg_over_time(reviews_pending_confirmation[$__interval])",
@@ -262,7 +262,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "femerkbw1lla8f"
+        "uid": "aemkvy2gx1r0gb"
       },
       "fieldConfig": {
         "defaults": {
@@ -314,7 +314,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "femerkbw1lla8f"
+            "uid": "aemkvy2gx1r0gb"
           },
           "editorMode": "code",
           "expr": "reviews_submitted_total",
