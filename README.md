@@ -294,7 +294,6 @@ kubectl port-forward -n default svc/my-app-grafana 1234:80
 2. Log in to Grafana
 - Default credentials:
   - Username: `admin`
-  - Password: `admin` (for minikube deployment)
   - Password: `prom-operator` (for kubernetes cluster deployment)
 
 Note: The port number (1234) can be changed to any available port on your local machine.
