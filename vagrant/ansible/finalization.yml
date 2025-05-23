@@ -147,17 +147,3 @@
       become_user: vagrant
       ansible.builtin.command: |
         kubectl wait --for=condition=ready pod --all -n istio-system --timeout=120s
-
-    - name: Add monitoring stack helm repo
-      kubernetes.core.helm_repository:
-        name: prometheus-community
-        url: https://prometheus-community.github.io/helm-charts
-
-    - name: Install monitoring stack
-      kubernetes.core.helm:
-          update_repo_cache: true
-          release_name: prometheus
-          chart_ref: prometheus-community/kube-prometheus-stack
-          release_namespace: monitoring
-          create_namespace: yes
-          release_state: present
