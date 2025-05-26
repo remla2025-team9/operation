@@ -1,19 +1,11 @@
-# apiVersion: v1
-# kind: Namespace
-# metadata:
-#   name: monitoring
-#   labels:
-#     name: monitoring
-# ---
----
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: app-service-servicemonitor
-  # namespace: monitoring
+  namespace: {{ .Release.Namespace }}
   labels:
     app: app-service
-    release: prometheus
+    release: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
@@ -26,15 +18,14 @@ spec:
       path: /metrics
       interval: 30s
 ---
----
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: reviews-submitted-alert
-  # namespace: monitoring
+  namespace: {{ .Release.Namespace }}
   labels:
     app: app-service
-    release: prometheus
+    release: {{ .Release.Name }}
 spec:
   groups:
     - name: reviews-submitted.rules
