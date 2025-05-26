@@ -77,8 +77,8 @@
 - Approved PR: 
 
 ### Artin
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/model-training/pull/13 (related to A4)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/11 (related to A4)
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/model-training/pull/11 (related to A4), https://github.com/remla2025-team9/operation/pull/30 (related to A3)
