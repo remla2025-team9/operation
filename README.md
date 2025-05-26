@@ -55,6 +55,23 @@ minikube start --cpus 2 --memory 2048 --driver=docker
 cd app-helm-chart
 ```
 
+3. Install the ingress-nginx repository manually
+```bash
+# Add the ingress-nginx repository
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+# Update repositories
+helm repo update
+
+# Create namespace for ingress-nginx
+kubectl create namespace ingress-nginx
+
+# Install ingress-nginx
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --set controller.service.type=LoadBalancer
+```
+
 3. Install the application:
 ```bash
 # Update dependencies first
@@ -63,13 +80,62 @@ helm dependency update
 helm install my-app .
 ```
 
-4. (Optional) Access the frontend:
-```bash
-# Start minikube tunnel in a separate terminal and bind it to "localhost"
-minikube tunnel --bind-address "127.0.0.1"
+4. Configure Local Access
 
-# After running the tunnel, the app should be accessible on "localhost"
+a. Check your service configuration in `values.yaml`:
+```yaml
+appFrontend:
+  ingress:
+    host: "app-frontend.k8s.local"  # Default frontend hostname
+  service:
+    port: 80              # Default frontend port
+
+appService:
+  ingress:
+    host: "app-service.k8s.local"  # Default backend hostname
+  service:
+    port: 80              # Default backend port
 ```
+
+b. Start Minikube tunnel with a fixed IP:
+```bash
+# Use any IP address you prefer, default is 127.0.0.1
+export INGRESS_BIND_IP=127.0.0.1
+minikube tunnel --bind-address $INGRESS_BIND_IP
+```
+
+c. Add hostnames to your local hosts file:
+
+**Linux/macOS**:
+```bash
+# Replace hostnames if you changed them in values.yaml
+sudo sh -c "echo '$INGRESS_BIND_IP app-frontend.k8s.local' >> /etc/hosts"
+sudo sh -c "echo '$INGRESS_BIND_IP app-service.k8s.local' >> /etc/hosts"
+```
+
+**Windows** (Run PowerShell as Administrator):
+```powershell
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "$INGRESS_BIND_IP app-frontend.k8s.local"
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "$INGRESS_BIND_IP app-service.k8s.local"
+```
+
+d. Access your services:
+- Frontend: `http://app-frontend.k8s.local:<frontend_port>`
+  - Default: http://app-frontend.k8s.local
+  - Custom: Use the port specified in `appFrontend.service.port`
+
+- Backend API: `http://app-service.k8s.local:<backend_port>`
+  - Default: http://app-service.k8s.local
+  - Custom: Use the port specified in `appService.service.port`
+
+Note: If you modify the default ports in `values.yaml`, you'll need to include them in the URL:
+```yaml
+# Example custom port configuration
+appFrontend:
+  service:
+    port: 8080  # Access via http://app-frontend.k8s.local:8080
+```
+
 
 ### Useful kubectl commands when the cluster is running
 
@@ -146,9 +212,9 @@ To set all environment variables locally before starting (all values can be chan
 ```bash
 export WORKER_COUNT_ENV=1
 export WORKER_CPU_COUNT_ENV=1
-export WORKER_MEMORY_ENV=2048
-export CONTROLLER_CPU_COUNT_ENV=1
-export CONTROLLER_MEMORY_ENV=1024
+export WORKER_MEMORY_ENV=1024
+export CONTROLLER_CPU_COUNT_ENV=2
+export CONTROLLER_MEMORY_ENV=2048
 vagrant up
 ```
 
@@ -187,3 +253,39 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 ```bash
 kubectl --kubeconfig config/.kubeconfig ...
 ```
+
+### Check Prometheus and Grafana with Helm
+
+Ensure the `prometheus-community` Helm repository is added to your local Helm setup, check it by running:
+
+```bash
+helm repo list
+```
+
+Ensure `my-app-grafana` in the pod, check it by running:
+
+```bash
+kubectl get svc -n default
+```
+
+### Accessing Grafana Dashboard in Minikube
+
+1. Access Grafana UI using port forwarding:
+```bash
+kubectl port-forward -n default svc/my-app-grafana 1234:80
+```
+
+- Navigate to: http://localhost:1234
+
+2. Log in to Grafana
+- Default credentials:
+  - Username: `admin`
+  - Password: `prom-operator` (for kubernetes cluster deployment)
+
+Note: The port number (1234) can be changed to any available port on your local machine.
+
+3. Import the Dashboard
+- In the Grafana UI:
+  1. Go to **Dashboards** in the left sidebar
+  2. Click **New** → **Import**
+  3. Upload the dashboard JSON file or paste the JSON content
