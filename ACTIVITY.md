@@ -73,8 +73,8 @@
 - Approved PR: https://github.com/remla2025-team9/app-service/pull/11 (related to A3)
 
 ### Raoul
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/model-training/pull/14 (related to A4)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/11 (related to A4)
 
 ### Artin
 - Created PR: https://github.com/remla2025-team9/model-training/pull/13 (related to A4)
