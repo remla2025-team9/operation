@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: app-frontend-virtualservice
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: app-frontend
+spec:
+  hosts:
+    - {{ .Values.appFrontend.ingress.host | quote }}
+  gateways:
+    - my-istio-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: app-frontend
+            port:
+              number: {{ .Values.appFrontend.service.port }}

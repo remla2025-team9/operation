@@ -69,4 +69,4 @@ grafana:
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
-
+useNginxIngress: false

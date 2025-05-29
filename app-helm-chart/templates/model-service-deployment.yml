@@ -12,7 +12,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment
+  name: model-service-deployment-v2
   labels:
     app: model-service
 spec:
@@ -20,10 +20,60 @@ spec:
   selector:
     matchLabels:
       app: model-service
+      version: v1
   template:
     metadata:
       labels:
         app: model-service
+        version: v1
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: model-service
+          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.image.tag }}"
+          imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.modelService.port }}
+          envFrom:
+            - configMapRef:
+                name: model-service-config
+          # env:
+          #   - name: SECRETS_FILE
+          #     value: "/etc/model-secrets/example-secret.txt" # Path where the secret file is mounted
+          volumeMounts:
+            - name: model-cache-storage
+              mountPath: /root/.cache
+            # - name: model-secrets-volume
+            #   mountPath: /etc/model-secrets
+            #   readOnly: true
+      volumes:
+        - name: model-cache-storage
+          persistentVolumeClaim:
+            claimName: model-cache-pvc
+        # - name: model-secrets-volume
+        #   secret:
+        #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
+        #     items:
+        #     - key: example-secret.txt # This key MUST exist in the secret
+        #       path: example-secret.txt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-service-deployment-v2
+  labels:
+    app: model-service
+spec:
+  replicas: {{ .Values.modelService.replicas }}
+  selector:
+    matchLabels:
+      app: model-service
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: model-service
+        version: v2
     spec:
       restartPolicy: Always
       containers:
