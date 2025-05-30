@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: model-cache-pv
+  name: model-cache-pv-v1
   labels:
     app: model-service
 spec:
@@ -9,5 +9,21 @@ spec:
     storage: {{ .Values.modelService.persistence.size }}
   accessModes:
     - ReadWriteOnce
+  storageClassName: manual
   hostPath:
-    path: /mnt/data/model-cache
+    path: /mnt/data/model-cache-v1
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: model-cache-pv-v2
+  labels:
+    app: model-service
+spec:
+  capacity:
+    storage: {{ .Values.modelService.persistence.size }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: /mnt/data/model-cache-v2
