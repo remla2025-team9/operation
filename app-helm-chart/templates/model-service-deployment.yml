@@ -12,7 +12,7 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment-v2
+  name: model-service-deployment-v1
   labels:
     app: model-service
 spec:
@@ -49,7 +49,7 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc
+            claimName: model-cache-pvc-v1
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
@@ -97,7 +97,7 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc
+            claimName: model-cache-pvc-v2
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}

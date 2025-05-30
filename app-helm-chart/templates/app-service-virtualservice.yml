@@ -8,15 +8,12 @@ spec:
   gateways:
     - my-istio-gateway
   http:
-    - match:
-        - headers:
-            experiment-user:
-              exact: "true"
-      route:
-        - destination:
-            host: app-service
-            subset: v2
     - route:
+        - destination:
+              host: app-service
+              subset: v2
+          weight: 10
         - destination:
             host: app-service
             subset: v1
+          weight: 90

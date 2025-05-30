@@ -12,9 +12,10 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-deployment
+  name: app-service-deployment-v2
   labels:
     app: app-service
+    version: v1
 spec:
   replicas: {{ .Values.appService.replicas }}
   selector:
@@ -47,10 +48,16 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-v2
+  name: app-service-deployment-v1
   labels:
     app: app-service
     version: v2
+spec:
+  replicas: {{ .Values.appService.replicas }}
+  selector:
+    matchLabels:
+      app: app-service
+      version: v2
   template:
     metadata:
       labels:
