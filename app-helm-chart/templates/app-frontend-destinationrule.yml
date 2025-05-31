@@ -7,11 +7,14 @@ spec:
   trafficPolicy:
     loadBalancer:
       consistentHash:
-        httpHeaderName: x-user
+        httpCookie:
+          name: user-cookie
+          ttl: 0s
   subsets:
-    - name: v1
+    - name: {{ .Values.appFrontend.stable.versionLabel }}
       labels:
-        version: v1
-    - name: v2
+        version: {{ .Values.appFrontend.stable.versionLabel }}
+    - name: {{ .Values.appFrontend.canary.versionLabel }}
       labels:
-        version: v2
+        version: {{ .Values.appFrontend.canary.versionLabel }}
+

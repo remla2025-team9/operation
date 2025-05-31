@@ -9,12 +9,12 @@ spec:
     - match:
         - sourceLabels:
             app: app-service
-            version: v2
+            version: {{ .Values.appService.canary.versionLabel }}
       route:
         - destination:
             host: model-service
-            subset: v2
+            subset: {{ .Values.modelService.canary.versionLabel }}
     - route:
         - destination:
             host: model-service
-            subset: v1
+            subset: {{ .Values.modelService.stable.versionLabel }}

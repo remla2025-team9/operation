@@ -1,15 +1,27 @@
 # model-service settings
 modelService:
   replicas: 1
+  stable:
+    versionLabel: stable
+    image:
+      tag: latest
+    config:
+      MODEL_VERSION: "v0.0.3-pre.0"
+      SERVICE_PORT: "5001"
+      SERVICE_HOST: "0.0.0.0"
+  canary:
+    enabled: true
+    versionLabel: canary
+    image:
+      tag: canary
+    config:
+      MODEL_VERSION: "v0.0.3-pre.0"
+      SERVICE_PORT: "5001"
+      SERVICE_HOST: "0.0.0.0"
   image:
     repository: ghcr.io/remla2025-team9/model-service
-    tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   port: 5001
-  config:
-    MODEL_VERSION: "v0.0.3-pre.0"
-    SERVICE_PORT: "5001"
-    SERVICE_HOST: "0.0.0.0"
   # secretName: example-secret
   persistence:
     size: 1Gi
@@ -17,35 +29,58 @@ modelService:
 # app-service settings
 appService:
   replicas: 1
+  stable:
+    versionLabel: "stable"
+    host: "app-service.k8s.local"
+    image:
+      tag: latest
+    config:
+      MODEL_SERVICE_URL: "http://model-service:5001"
+      FLASK_ENV: "production"
+      FLASK_RUN_HOST: "0.0.0.0"
+      FLASK_RUN_PORT: "5000"
+  canary:
+    enabled: true
+    versionLabel: "canary"
+    host: "canary.app-service.k8s.local"
+    image:
+      tag: canary
+    config:
+      MODEL_SERVICE_URL: "http://model-service:5001"
+      FLASK_ENV: "production"
+      FLASK_RUN_HOST: "0.0.0.0"
+      FLASK_RUN_PORT: "5000"
   image:
     repository: ghcr.io/remla2025-team9/app-service
-    tag: latest
     pullPolicy: Always
   port: 5000
   service:
     port: 80
-  ingress: 
-    host: "app-service.k8s.local"
-  config:
-    MODEL_SERVICE_URL: "http://model-service:5001"
-    FLASK_ENV: "production"
-    FLASK_RUN_HOST: "0.0.0.0"
-    FLASK_RUN_PORT: "5000"
 
 # app-frontend settings
 appFrontend:
   replicas: 1
+  stable:
+    versionLabel: "stable"
+    image:
+      tag: latest
+    config:
+      APP_SERVICE_URL: "http://app-service.k8s.local"
+  canary: 
+    enabled: true
+    versionLabel: "canary"
+    image:
+      tag: canary
+    config:
+      APP_SERVICE_URL: "http://canary.app-service.k8s.local"
   image:
     repository: ghcr.io/remla2025-team9/app-frontend
-    tag: latest
     pullPolicy: IfNotPresent
   port: 3000 # Internal port the container listens on
   service:
     port: 80 # Service port for Ingress to target
   ingress:
     host: "app-frontend.k8s.local"
-  config:
-    APP_SERVICE_URL: "http://app-service.k8s.local"
 
 appSecret:
   enabled: true

@@ -19,11 +19,11 @@ spec:
             host: app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: v2
-          weight: 10
+            subset: {{ .Values.appFrontend.stable.versionLabel }}
+          weight: 50
         - destination:
             host: app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: v1
-          weight: 90
+            subset: {{ .Values.appFrontend.canary.versionLabel }}
+          weight: 50
