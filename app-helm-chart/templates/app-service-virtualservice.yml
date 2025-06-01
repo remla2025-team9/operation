@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: app-service-vs
+spec:
+  hosts:
+    - {{ .Values.appService.ingress.host | quote }}
+  gateways:
+    - my-istio-gateway
+  http:
+    - match:
+        - sourceLabels:
+            app: app-frontend
+            version: v2
+      route:
+        - destination:
+            host: app-service
+            subset: v2
+    - route:
+        - destination:
+            host: app-service
+            subset: v1

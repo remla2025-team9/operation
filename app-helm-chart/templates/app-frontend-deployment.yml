@@ -12,18 +12,51 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-frontend-deployment
+  name: app-frontend-deployment-v1
   labels:
     app: app-frontend
+    version: v1
 spec:
   replicas: {{ .Values.appFrontend.replicas }}
   selector:
     matchLabels:
       app: app-frontend
+      version: v1
   template:
     metadata:
       labels:
         app: app-frontend
+        version: v1
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: app-frontend
+          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.image.tag }}"
+          imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appFrontend.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-frontend-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-frontend-deployment-v2
+  labels:
+    app: app-frontend
+    version: v2
+spec:
+  replicas: {{ .Values.appFrontend.replicas }}
+  selector:
+    matchLabels:
+      app: app-frontend
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: app-frontend
+        version: v2
     spec:
       restartPolicy: Always
       containers:

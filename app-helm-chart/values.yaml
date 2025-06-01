@@ -69,4 +69,17 @@ grafana:
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
-
+kube-prometheus-stack:
+  prometheusOperator:
+    admissionWebhooks:
+      enabled: false
+      createSecret:
+        enabled: false
+        annotations:
+          sidecar.istio.io/inject: "false"
+      patch:
+        enabled: false
+        annotations:
+          sidecar.istio.io/inject: "false"
+    tls:
+      enabled: false

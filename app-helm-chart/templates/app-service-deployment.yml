@@ -12,18 +12,57 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-deployment
+  name: app-service-deployment-v2
   labels:
     app: app-service
+    version: v1
 spec:
   replicas: {{ .Values.appService.replicas }}
   selector:
     matchLabels:
       app: app-service
+      version: v1
   template:
     metadata:
       labels:
         app: app-service
+        version: v1
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: app-service
+          image: "{{ .Values.appService.image.repository }}:{{ .Values.appService.image.tag }}"
+          imagePullPolicy: {{ .Values.appService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appService.port }}
+          envFrom:
+            - configMapRef:
+                name: app-service-config
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-app-secret
+                  key: API_KEY
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-deployment-v1
+  labels:
+    app: app-service
+    version: v2
+spec:
+  replicas: {{ .Values.appService.replicas }}
+  selector:
+    matchLabels:
+      app: app-service
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: app-service
+        version: v2
     spec:
       restartPolicy: Always
       containers:
