@@ -45,34 +45,31 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 ### Setup steps
 
-1. Start Minikube with appropriate resources:
+1. Start Minikube with appropriate resources and enable ingress:
 ```bash
-minikube start --cpus 2 --memory 2048 --driver=docker
+minikube start --cpus 4 --memory 4096 --driver=docker
+minikube addons enable ingress
 ```
 
-2. Navigate to the Helm chart directory:
+2. Install istio and the required addons:
+```bash
+istioctl install
+# go to the appropriate directory where istio is installed
+kubectl apply -f istio-1.26.0/samples/addons/prometheus.yaml
+kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
+kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
+kubectl apply -f istio-1.26.0/samples/addons/grafana.yaml
+```
+3. Enable istio sidecar injection for the namespace:
+```bash
+kubectl label namespace default istio-injection=enabled
+```
+5. Navigate to the Helm chart directory:
 ```bash
 cd app-helm-chart
 ```
 
-3. Install the ingress-nginx repository manually
-```bash
-# Add the ingress-nginx repository
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-
-# Update repositories
-helm repo update
-
-# Create namespace for ingress-nginx
-kubectl create namespace ingress-nginx
-
-# Install ingress-nginx
-helm install ingress-nginx ingress-nginx/ingress-nginx \
-  --namespace ingress-nginx \
-  --set controller.service.type=LoadBalancer
-```
-
-3. Install the application:
+6. Install the application:
 ```bash
 # Update dependencies first
 helm dependency update
@@ -80,7 +77,7 @@ helm dependency update
 helm install my-app .
 ```
 
-4. Configure Local Access
+7. Configure Local Access
 
 a. Check your service configuration in `values.yaml`:
 ```yaml
