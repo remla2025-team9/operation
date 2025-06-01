@@ -47,7 +47,7 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 1. Start Minikube with appropriate resources and enable ingress:
 ```bash
-minikube start --cpus 4 --memory 4096 --driver=docker
+minikube start --cpus 6 --memory 6144 --driver=docker
 minikube addons enable ingress
 ```
 
