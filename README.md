@@ -169,6 +169,33 @@ minikube stop
 
 ---
 
+### Istio Rate Limiting Guide
+
+- Run the following commands:
+
+  ```bash
+  # Apply rate limit ConfigMap and EnvoyFilter
+  kubectl apply -f rate-limiting.yaml -n istio-system
+
+  # Deploy the rate limit service
+  kubectl apply -f path/to/istio/samples/ratelimit/rate-limit-service.yaml -n istio-system
+  ```
+- Test Rate Limiting:
+
+  Replace the `GATEWAY_PORT` value with your actual NodePort (found via `kubectl -n istio-system get svc istio-ingressgateway`).
+
+  ```bash
+  export GATEWAY_PORT=30530  # Replace with your actual port
+
+  for i in {1..20}; do
+    curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://192.168.49.2:$GATEWAY_PORT/
+  done
+  ```
+  If over 10 requests are made within one minute, subsequent ones should return a 429 Too Many Requests error.
+
+---
+
+
 ## Repositories
 
 Each repository has a `README.md` file with information about running. Below is a summary of each repository:
