@@ -32,7 +32,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: app-frontend
-          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.image.stableTag }}"
+          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.stable.image.tag }}"
           imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appFrontend.port }}
@@ -75,7 +75,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: app-frontend
-          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.image.canaryTag }}"
+          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.canary.image.tag }}"
           imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appFrontend.port }}

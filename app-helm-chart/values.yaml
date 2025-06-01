@@ -75,7 +75,7 @@ appFrontend:
       APP_SERVICE_URL: "http://canary.app-service.k8s.local"
   image:
     repository: ghcr.io/remla2025-team9/app-frontend
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   port: 3000 # Internal port the container listens on
   service:
     port: 80 # Service port for Ingress to target

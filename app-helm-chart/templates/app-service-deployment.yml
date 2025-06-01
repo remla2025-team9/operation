@@ -46,6 +46,7 @@ spec:
                   name: {{ .Release.Name }}-app-secret
                   key: API_KEY
 ---
+{{- if .Values.appService.canary.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -58,7 +59,6 @@ data:
   {{ $key }}: {{ $val | quote }}
   {{- end }}
 ---
-{{- if .Values.appService.canary.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
