@@ -1,8 +1,8 @@
-# Streamlining Release Automation for Istio-Enabled Workload
+# Automating Reproducible Artifact Generation in CI Pipelines
 
 ## 1. Context and Problem Statement
 
-Over the last few sprints, our DVC pipeline sometimes fails at the preprocessing stage because `preprocessor.joblib` is tracked as an output. Even when neither the raw data nor the preprocessing script changes, the serialized transformer’s checksum varies on each run. That leads to messages like:
+Over the last few sprints, our DVC pipeline sometimes becomes inconsistent at the preprocessing stage because `preprocessor.joblib` is tracked as an output. Even when neither the raw data nor the preprocessing script changes, the serialized transformer’s checksum varies on each run. That leads to messages like:
 
 ```
 WARNING: Some cache files do not exist… Missing cache files: edcffd9f…
@@ -14,13 +14,13 @@ In practice, this causes three main issues:
 1. **Cloning and pulling from DVC**  
    When team members clone the repository and run `dvc pull` without making any changes, they see a “missing cache” error for `preprocessor.joblib`.
 
-2. **Manual fixes break the pipeline**  
+2. **Manual intervention leads to downstream instability**  
    If someone deletes or replaces `preprocessor.joblib` by hand, downstream stages—feature generation, model training, and evaluation—fail because they expect a stable preprocessor object.
 
-3. **Unreliable CI tests**  
+3. **Inconsistent CI results due to non-determinism**  
    Automated tests that load `preprocessor.joblib` fail at random. That leaves our CI builds red and blocks merges.
 
-Our goal is to make the pipeline reproducible: after cloning and running `dvc pull`, a simple `dvc repro` should generate the same `preprocessor.joblib` and let all later stages run without manual intervention.
+We aim to improve reproducibility and reduce manual overhead in our release process: after cloning and running `dvc pull`, a simple `dvc repro` should generate the same `preprocessor.joblib` and let all later stages run without manual intervention.
 
 ## 2. Why It Matters
 
@@ -36,9 +36,9 @@ Our goal is to make the pipeline reproducible: after cloning and running `dvc pu
 - **Onboarding difficulty**  
   New team members or interns spend more time fixing DVC problems than understanding our pipeline’s logic. That creates a bad first impression.
 
-## 3. Proposed Fix: Deterministic Preprocessing and DVC Cleanup
+## 3. Feature Addition: Automated Artifact Generation and CI Validation
 
-We suggest a two-part approach:
+To improve automation, ensure reproducibility, and strengthen CI validation, we introduce a feature that enables deterministic preprocessing and verifies artifact integrity automatically:
 
 ### A. Stop Tracking `preprocessor.joblib` Directly in DVC
 
