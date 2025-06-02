@@ -1,0 +1,191 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true, "hide": true, "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts", "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Total Correction Rate (Over Selected Time Range)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "10.2.x", 
+      "targets": [
+        {
+          "refId": "A_STABLE_RATE",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(increase(overrides_by_user_total{job=~\"$job\", version_label=\"stable\"}[$__range]))\n/\nsum(increase(reviews_submitted_total{job=~\"$job\", version_label=\"stable\"}[$__range]))",
+          "legendFormat": "Stable Correction Rate",
+          "instant": true 
+        },
+        {
+          "refId": "B_CANARY_RATE",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(increase(overrides_by_user_total{job=~\"$job\", version_label=\"canary\"}[$__range]))\n/\nsum(increase(reviews_submitted_total{job=~\"$job\", version_label=\"canary\"}[$__range]))",
+          "legendFormat": "Canary Correction Rate",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit", "decimals": 2,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Total Submitted Reviews (Current Value)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "10.2.x",
+      "targets": [
+        {
+          "refId": "A_STABLE_SUBMITTED",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(reviews_submitted_total{job=~\"$job\", version_label=\"stable\"})",
+          "legendFormat": "Stable Total Submitted",
+          "instant": true
+        },
+        {
+          "refId": "B_CANARY_SUBMITTED",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(reviews_submitted_total{job=~\"$job\", version_label=\"canary\"})",
+          "legendFormat": "Canary Total Submitted",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short", "decimals": 0,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "Average Prediction Latency (Over Selected Time Range)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 6 },
+      "id": 3,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "10.2.x",
+      "targets": [
+        {
+          "refId": "A_STABLE_AVG_LATENCY",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(predictions_latency_seconds_sum{job=~\"$job\", version_label=\"stable\"}[$__range]))\n/\nsum(rate(predictions_latency_seconds_count{job=~\"$job\", version_label=\"stable\"}[$__range]))",
+          "legendFormat": "Stable Avg Latency",
+          "instant": true
+        },
+        {
+          "refId": "B_CANARY_AVG_LATENCY",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "sum(rate(predictions_latency_seconds_sum{job=~\"$job\", version_label=\"canary\"}[$__range]))\n/\nsum(rate(predictions_latency_seconds_count{job=~\"$job\", version_label=\"canary\"}[$__range]))",
+          "legendFormat": "Canary Avg Latency",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s", "decimals": 3,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "title": "P95 Prediction Latency (Over Selected Time Range)",
+      "type": "stat",
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 6 },
+      "id": 4,
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto", "textMode": "auto", "colorMode": "value", "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "10.2.x",
+      "targets": [
+        {
+          "refId": "A_STABLE_P95_LATENCY",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(predictions_latency_seconds_bucket{job=~\"$job\", version_label=\"stable\"}[$__range])) by (le, version_label))",
+          "legendFormat": "Stable P95 Latency",
+          "instant": true
+        },
+        {
+          "refId": "B_CANARY_P95_LATENCY",
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "histogram_quantile(0.95, sum(rate(predictions_latency_seconds_bucket{job=~\"$job\", version_label=\"canary\"}[$__range])) by (le, version_label))",
+          "legendFormat": "Canary P95 Latency",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s", "decimals": 3,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "refresh": "30s", 
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["experiment", "app-service", "summary"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(reviews_submitted_total, job)",
+        "description": "Select the Prometheus job name for app-service.",
+        "hide": 0, "includeAll": true, "label": "Job", "multi": true,
+        "name": "job", "options": [],
+        "query": { "query": "label_values(reviews_submitted_total, job)", "refId": "StandardVariableQuery" },
+        "refresh": 1, "regex": "", "skipUrlSync": false, "sort": 0, "type": "query"
+      }
+    ]
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Experiment Dashboard",
+  "uid": "exp-app-service-001",
+  "version": 1,
+  "weekStart": ""
+}

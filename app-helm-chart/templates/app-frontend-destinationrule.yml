@@ -4,14 +4,18 @@ metadata:
   name: app-frontend-dr
 spec:
   host: app-frontend
-  trafficPolicy:
-    loadBalancer:
-      consistentHash:
-        httpHeaderName: x-user
+  # trafficPolicy:
+  #   loadBalancer:
+  #     consistentHash:
+  #       httpCookie: # Use this for cookie-based consistent hashing
+  #         name: session-cookie # The name of the cookie Istio will use/generate
+  #         path: "/"            # Scope the cookie to the root path
+  #         ttl: 0s 
   subsets:
-    - name: v1
+    - name: {{ .Values.appFrontend.stable.versionLabel }}
       labels:
-        version: v1
-    - name: v2
+        version: {{ .Values.appFrontend.stable.versionLabel }}
+    - name: {{ .Values.appFrontend.canary.versionLabel }}
       labels:
-        version: v2
+        version: {{ .Values.appFrontend.canary.versionLabel }}
+

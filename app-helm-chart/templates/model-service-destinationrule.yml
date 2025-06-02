@@ -9,9 +9,11 @@ spec:
       consistentHash:
         httpHeaderName: x-user
   subsets:
-    - name: v1
+    - name: {{ .Values.modelService.stable.versionLabel }}
       labels:
-        version: v1
-    - name: v2
+        version: {{ .Values.modelService.stable.versionLabel }}
+    {{- if .Values.modelService.canary.enabled }}
+    - name: {{ .Values.modelService.canary.versionLabel }}
       labels:
-        version: v2
+        version: {{ .Values.modelService.canary.versionLabel }}
+    {{- end }}

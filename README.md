@@ -47,7 +47,7 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 
 1. Start Minikube with appropriate resources and enable ingress:
 ```bash
-minikube start --cpus 4 --memory 4096 --driver=docker
+minikube start --cpus 6 --memory 6144 --driver=docker
 minikube addons enable ingress
 ```
 
@@ -58,7 +58,6 @@ istioctl install
 kubectl apply -f istio-1.26.0/samples/addons/prometheus.yaml
 kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
 kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
-kubectl apply -f istio-1.26.0/samples/addons/grafana.yaml
 ```
 3. Enable istio sidecar injection for the namespace:
 ```bash
@@ -88,8 +87,10 @@ appFrontend:
     port: 80              # Default frontend port
 
 appService:
-  ingress:
+  stable:
     host: "app-service.k8s.local"  # Default backend hostname
+  canary:
+    host: "canary.app-service.k8s.local" # Default canary backend hostname
   service:
     port: 80              # Default backend port
 ```
@@ -108,6 +109,10 @@ c. Add hostnames to your local hosts file:
 # Replace hostnames if you changed them in values.yaml
 sudo sh -c "echo '$INGRESS_BIND_IP app-frontend.k8s.local' >> /etc/hosts"
 sudo sh -c "echo '$INGRESS_BIND_IP app-service.k8s.local' >> /etc/hosts"
+sudo sh -c "echo '$INGRESS_BIND_IP canary.app-service.k8s.local' >> /etc/hosts"
+
+# Check if the hostnames are correctly added to the /etc/hosts file
+cat /etc/hosts
 ```
 
 **Windows** (Run PowerShell as Administrator):
@@ -134,31 +139,7 @@ appFrontend:
 ```
 
 
-### Useful kubectl commands when the cluster is running
-
-Monitor the deployment:
-```bash
-# Get all pods
-kubectl get pods
-
-# Get all services
-kubectl get services
-
-# Get ingress details
-kubectl get ingress
-
-# View pod logs
-kubectl logs -l app=app-frontend
-kubectl logs -l app=app-service
-kubectl logs -l app=model-service
-
-# Describe resources for troubleshooting
-kubectl describe pod <pod-name>
-kubectl describe service <service-name>
-kubectl describe ingress <ingress-name>
-```
-
-Clean up:
+### Clean up minikube:
 ```bash
 # Uninstall the application
 helm uninstall my-app

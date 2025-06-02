@@ -1,25 +1,27 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: model-cache-pvc-v1
+  name: model-cache-pvc-{{ .Values.modelService.stable.versionLabel }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  volumeName: model-cache-pv-v1
+  volumeName: model-cache-pv-{{ .Values.modelService.stable.versionLabel }}
   storageClassName: manual
 ---
+{{- if .Values.modelService.canary.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: model-cache-pvc-v2
+  name: model-cache-pvc-{{ .Values.modelService.canary.versionLabel }}
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
-  volumeName: model-cache-pv-v2
+  volumeName: model-cache-pv-{{ .Values.modelService.canary.versionLabel }}
   storageClassName: manual
+{{- end }}
