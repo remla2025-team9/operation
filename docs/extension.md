@@ -43,7 +43,7 @@ To improve automation, ensure reproducibility, and strengthen CI validation, we 
 ### A. Stop Tracking `preprocessor.joblib` Directly in DVC
 
 1. **Reason**  
-   DVC is ideal for tracking large files whose contents stay the same when inputs do not change. Our `preprocessor.joblib` includes metadata—timestamps or memory addresses—that change on every run. As a result, its checksum fluctuates even if code and data are unchanged.
+   DVC is ideal for tracking large files whose contents stay the same when inputs do not change. Our `preprocessor.joblib` includes metadata, timestamps or memory addresses, that change on every run. As a result, its checksum fluctuates even if code and data are unchanged.
 
 2. **Implementation steps**  
    - Run:
