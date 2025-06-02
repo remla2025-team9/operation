@@ -91,8 +91,8 @@
 # Week 6
 
 ### Timo
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/operation/pull/41 (related to A5)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/39 (related to A5)
 
 ### Raoul
 - Created PR: 
