@@ -38,7 +38,7 @@ Our goal is to make the pipeline reproducible: after cloning and running `dvc pu
 
 ## 3. Proposed Fix: Deterministic Preprocessing and DVC Cleanup
 
-I suggest a two-part approach:
+We suggest a two-part approach:
 
 ### A. Stop Tracking `preprocessor.joblib` Directly in DVC
 
