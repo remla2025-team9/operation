@@ -58,7 +58,6 @@ istioctl install
 kubectl apply -f istio-1.26.0/samples/addons/prometheus.yaml
 kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
 kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
-kubectl apply -f istio-1.26.0/samples/addons/grafana.yaml
 ```
 3. Enable istio sidecar injection for the namespace:
 ```bash

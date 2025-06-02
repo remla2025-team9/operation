@@ -40,7 +40,7 @@ spec:
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.stable.versionLabel }}
-          weight: 50
+          weight: 90
           headers:
             response:
               add:
@@ -50,7 +50,7 @@ spec:
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.canary.versionLabel }}
-          weight: 50
+          weight: 10
           headers:
             response:
               add:

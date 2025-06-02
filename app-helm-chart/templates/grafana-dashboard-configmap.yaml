@@ -7,3 +7,5 @@ metadata:
 data:
   my-dashboard.json: |
 {{ .Files.Get "grafana-dashboards/my-dashboard.json" | indent 4 }}
+  experiment-dashboard.json: |
+{{ .Files.Get "grafana-dashboards/experiment-dashboard.json" | indent 4 }}
