@@ -15,7 +15,7 @@ In practice, this causes three main issues:
    When team members clone the repository and run `dvc pull` without making any changes, they see a “missing cache” error for `preprocessor.joblib`.
 
 2. **Manual intervention leads to downstream instability**  
-   If someone deletes or replaces `preprocessor.joblib` by hand, downstream stages—feature generation, model training, and evaluation—fail because they expect a stable preprocessor object.
+   If someone deletes or replaces `preprocessor.joblib` by hand, downstream stages, feature generation, model training, and evaluation, fail because they expect a stable preprocessor object.
 
 3. **Inconsistent CI results due to non-determinism**  
    Automated tests that load `preprocessor.joblib` fail at random. That leaves our CI builds red and blocks merges.
