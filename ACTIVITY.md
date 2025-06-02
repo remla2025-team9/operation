@@ -104,7 +104,7 @@
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/operation/pull/36 (related to A5)
-- Approved PR: https://github.com/remla2025-team9/app-service/pull/16 (related to A5)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/41 (related to A5)
   
 ### Lucian
 - Created PR: https://github.com/remla2025-team9/operation/pull/40 (related to A5)
