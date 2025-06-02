@@ -4,19 +4,27 @@ metadata:
   name: app-service-vs
 spec:
   hosts:
-    - {{ .Values.appService.ingress.host | quote }}
+    - {{ .Values.appService.stable.host | quote }}
+    {{- if .Values.appService.canary.enabled }}
+    - {{ .Values.appService.canary.host | quote }}
+    {{- end }}
   gateways:
     - my-istio-gateway
   http:
     - match:
-        - sourceLabels:
-            app: app-frontend
-            version: v2
+        - authority:
+            exact: {{ .Values.appService.stable.host | quote }}
       route:
         - destination:
             host: app-service
-            subset: v2
-    - route:
+            subset: {{ .Values.appService.stable.versionLabel }}
+    
+    {{- if .Values.appService.canary.enabled }}
+    - match:
+        - authority:
+            exact: {{ .Values.appService.canary.host | quote }}
+      route:
         - destination:
             host: app-service
-            subset: v1
+            subset: {{ .Values.appService.canary.versionLabel }}
+    {{- end }}

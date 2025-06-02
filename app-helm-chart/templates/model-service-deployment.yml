@@ -1,18 +1,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: model-service-config
+  name: model-service-config-{{ .Values.modelService.stable.versionLabel }}
   labels:
-    app: model-service 
+    app: model-service
+    version: {{ .Values.modelService.stable.versionLabel }}
 data:
-  {{- range $key, $val := .Values.modelService.config }}
+  {{- range $key, $val := .Values.modelService.stable.config }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment-v1
+  name: model-service-deployment-{{ .Values.modelService.stable.versionLabel }}
   labels:
     app: model-service
 spec:
@@ -20,23 +21,23 @@ spec:
   selector:
     matchLabels:
       app: model-service
-      version: v1
+      version: {{ .Values.modelService.stable.versionLabel }}
   template:
     metadata:
       labels:
         app: model-service
-        version: v1
+        version: {{ .Values.modelService.stable.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
         - name: model-service
-          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.image.tag }}"
+          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.stable.image.tag }}"
           imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.modelService.port }}
           envFrom:
             - configMapRef:
-                name: model-service-config
+                name: model-service-config-{{ .Values.modelService.stable.versionLabel }}
           # env:
           #   - name: SECRETS_FILE
           #     value: "/etc/model-secrets/example-secret.txt" # Path where the secret file is mounted
@@ -49,7 +50,7 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc-v1
+            claimName: model-cache-pvc-{{ .Values.modelService.stable.versionLabel }}
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
@@ -57,10 +58,23 @@ spec:
         #     - key: example-secret.txt # This key MUST exist in the secret
         #       path: example-secret.txt
 ---
+{{- if .Values.modelService.canary.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-service-config-{{ .Values.modelService.canary.versionLabel }}
+  labels:
+    app: model-service
+    version: {{ .Values.modelService.canary.versionLabel }}
+data:
+  {{- range $key, $val := .Values.modelService.canary.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment-v2
+  name: model-service-deployment-{{ .Values.modelService.canary.versionLabel }}
   labels:
     app: model-service
 spec:
@@ -68,23 +82,23 @@ spec:
   selector:
     matchLabels:
       app: model-service
-      version: v2
+      version: {{ .Values.modelService.canary.versionLabel }}
   template:
     metadata:
       labels:
         app: model-service
-        version: v2
+        version: {{ .Values.modelService.canary.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
         - name: model-service
-          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.image.tag }}"
+          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.canary.image.tag }}"
           imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.modelService.port }}
           envFrom:
             - configMapRef:
-                name: model-service-config
+                name: model-service-config-{{ .Values.modelService.canary.versionLabel }}
           # env:
           #   - name: SECRETS_FILE
           #     value: "/etc/model-secrets/example-secret.txt" # Path where the secret file is mounted
@@ -97,10 +111,11 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc-v2
+            claimName: model-cache-pvc-{{ .Values.modelService.canary.versionLabel }}
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
         #     items:
         #     - key: example-secret.txt # This key MUST exist in the secret
         #       path: example-secret.txt
+{{- end }}
