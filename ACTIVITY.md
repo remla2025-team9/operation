@@ -87,3 +87,26 @@
 ### Lucian
 - Created PR: https://github.com/remla2025-team9/model-training/pull/12 (related to A4)
 - Approved PR: https://github.com/remla2025-team9/app-service/pull/11 (related to A3)
+
+# Week 6
+
+### Timo
+- Created PR: 
+- Approved PR: 
+
+### Raoul
+- Created PR: 
+- Approved PR: 
+
+### Artin
+- Created PR: 
+- Approved PR: 
+
+### Shuang
+- Created PR: https://github.com/remla2025-team9/operation/pull/36 (related to A5)
+- Approved PR: https://github.com/remla2025-team9/app-service/pull/16 (related to A5)
+  
+### Lucian
+- Created PR: 
+- Approved PR: 
+
