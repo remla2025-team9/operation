@@ -175,90 +175,6 @@ minikube stop
   If over 10 requests are made within one minute, subsequent ones should return a 429 Too Many Requests error.
 
 ---
-
-
-## Repositories
-
-Each repository has a `README.md` file with information about running. Below is a summary of each repository:
-
-| Repository                                                          | Description                                                                                                                                                                                                                        |
-|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [model-training](https://github.com/remla2025-team9/model-training) | Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.                                                                                                                       |
-| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.                                                                               |
-| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.                                                                                                         |
-| [app-service](https://github.com/remla2025-team9/app-service)       | Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing. |
-| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
-| [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
-| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
-
-
-## Provision
-
-Start the environment:
-
-```bash
-vagrant up --provision
-```
-
-### Environment variables
-
-The following environment variables can be used to customize the VM configurations:
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| WORKER_COUNT_ENV | Number of worker nodes to create | 2 |
-| WORKER_CPU_COUNT_ENV | Number of CPUs for each worker | 2 |
-| WORKER_MEMORY_ENV | Memory (MB) for each worker | 6144 |
-| CONTROLLER_CPU_COUNT_ENV | Number of CPUs for controller | 1 |
-| CONTROLLER_MEMORY_ENV | Memory (MB) for controller | 4096 |
-
-To set all environment variables locally before starting (all values can be changed to match your needs):
-
-```bash
-export WORKER_COUNT_ENV=1
-export WORKER_CPU_COUNT_ENV=1
-export WORKER_MEMORY_ENV=1024
-export CONTROLLER_CPU_COUNT_ENV=2
-export CONTROLLER_MEMORY_ENV=2048
-vagrant up
-```
-
-### Base configuration
-
-- All VMs use the `bento/ubuntu-24.04` box.
-- VMs are assigned static IPs in the `192.168.56.*` range:
-  - Controller node (`ctrl`): `192.168.56.100`
-  - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
-
-### Ansible provisioning
-
-Each VM is further configured using Ansible playbooks:
-
-- **Controller (`ctrl`)** runs:
-  - `ansible/general.yaml`
-  - `ansible/ctrl.yaml`
-- **Worker nodes (`node-X`)** run:
-  - `ansible/general.yaml`
-  - `ansible/node.yaml`
-
-To spin up the VMs, make sure to be in the '/vagrant' directory and run:
-
-```bash
-vagrant up
-```
-
-After the Kubernetes cluster is up, the installation can be finalized by running the following command in the `/vagrant/ansible` directory:
-
-```bash
-ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
-```
-
-Afterwards, you can find the kubernetes configuration file in `config/.kubeconfig`. You can use this file to connect to the Kubernetes cluster from your local machine. Make sure to set the `KUBECONFIG` environment variable to point to this file:
-
-```bash
-kubectl --kubeconfig config/.kubeconfig ...
-```
-
 ### Check Prometheus and Grafana with Helm
 
 Ensure the `prometheus-community` Helm repository is added to your local Helm setup, check it by running:
@@ -294,3 +210,89 @@ Note: The port number (1234) can be changed to any available port on your local 
   1. Go to **Dashboards** in the left sidebar
   2. Click **New** → **Import**
   3. Upload the dashboard JSON file or paste the JSON content
+---
+
+## Repositories
+
+Each repository has a `README.md` file with information about running. Below is a summary of each repository:
+
+| Repository                                                          | Description                                                                                                                                                                                                                        |
+|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [model-training](https://github.com/remla2025-team9/model-training) | Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.                                                                                                                       |
+| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.                                                                               |
+| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.                                                                                                         |
+| [app-service](https://github.com/remla2025-team9/app-service)       | Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing. |
+| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
+| [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
+| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
+
+
+## Provision
+
+### Environment variables
+
+The following environment variables can be used to customize the VM configurations:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| WORKER_COUNT_ENV | Number of worker nodes to create | 2 |
+| WORKER_CPU_COUNT_ENV | Number of CPUs for each worker | 2 |
+| WORKER_MEMORY_ENV | Memory (MB) for each worker | 6144 |
+| CONTROLLER_CPU_COUNT_ENV | Number of CPUs for controller | 1 |
+| CONTROLLER_MEMORY_ENV | Memory (MB) for controller | 4096 |
+
+To set all environment variables locally before starting (all values can be changed to match your needs):
+
+```bash
+export WORKER_COUNT_ENV=1
+export WORKER_CPU_COUNT_ENV=1
+export WORKER_MEMORY_ENV=1024
+export CONTROLLER_CPU_COUNT_ENV=2
+export CONTROLLER_MEMORY_ENV=2048
+```
+
+### Base configuration
+
+- All VMs use the `bento/ubuntu-24.04` box.
+- VMs are assigned static IPs in the `192.168.56.*` range:
+  - Controller node (`ctrl`): `192.168.56.100`
+  - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
+
+### Ansible provisioning
+
+Each VM is further configured using Ansible playbooks:
+
+- **Controller (`ctrl`)** runs:
+  - `ansible/general.yaml`
+  - `ansible/ctrl.yaml`
+- **Worker nodes (`node-X`)** run:
+  - `ansible/general.yaml`
+  - `ansible/node.yaml`
+
+To spin up the VMs, make sure to be in the '/vagrant' directory
+
+### Provisioning the Kubernetes cluster and spinning up VMs
+
+First, copy your SSH public key into the template files:
+
+```bash
+cp ~/.ssh/id_rsa.pub /ssh/<your_username>.pub
+```
+
+Then, run the following command to start the VMs and provision them with Ansible:
+
+```bash
+vagrant up
+```
+
+After the Kubernetes cluster is up, the installation can be finalized by running the following command in the `vagrant/` directory:
+
+```bash
+ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
+```
+
+Afterwards, you can find the kubernetes configuration file in `config/.kubeconfig`. You can use this file to connect to the Kubernetes cluster from your local machine. Make sure to set the `KUBECONFIG` environment variable to point to this file:
+
+```bash
+kubectl --kubeconfig config/.kubeconfig ...
+```
