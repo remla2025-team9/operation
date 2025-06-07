@@ -98,14 +98,60 @@
         filename: kubernetes-community
         state: present
     
+    - name: Check available runc version
+      ansible.builtin.command: apt-cache policy runc
+      register: runc_version
+      changed_when: false
+    
+
+    - name: Extract runc version 1.1.12
+      ansible.builtin.set_fact:
+        runc_specific_version: "{{ runc_version.stdout_lines | select('match', '.*1.1.12.*') | first | regex_replace('\\s+', ' ') | trim }}"
+      
+    - name: Check containerd version
+      ansible.builtin.command: apt-cache policy containerd
+      register: containerd_version
+      changed_when: false
+    
+    - name: Extract containerd version 1.7.24
+      ansible.builtin.set_fact:
+        containerd_specific_version: "{{ containerd_version.stdout_lines | select('match', '.*1.7.24.*') | first | regex_replace('\\s+', ' ') | trim }}"
+    
+    - name: Check kubeadm version
+      ansible.builtin.command: apt-cache policy kubeadm
+      register: kubeadm_version
+      changed_when: false
+    
+    - name: Extract kubeadm version 1.32.4
+      ansible.builtin.set_fact:
+        kubeadm_specific_version: "{{ kubeadm_version.stdout_lines | select('match', '.*1.32.4.*') | first | regex_replace('\\s+', ' ') | trim }}"
+    
+    - name: Check kubelet version
+      ansible.builtin.command: apt-cache policy kubelet
+      register: kubelet_version
+      changed_when: false
+    
+    - name: Extract kubelet version 1.32.4
+      ansible.builtin.set_fact:
+        kubelet_specific_version: "{{ kubelet_version.stdout_lines | select('match', '.*1.32.4.*') | first | regex_replace('\\s+', ' ') | trim }}"
+    
+    - name: Check kubectl version
+      ansible.builtin.command: apt-cache policy kubectl
+      register: kubectl_version
+      changed_when: false
+    
+    - name: Extract kubectl version 1.32.4
+      ansible.builtin.set_fact:
+        kubectl_specific_version: "{{ kubectl_version.stdout_lines | select('match', '.*1.32.4.*') | first | regex_replace('\\s+', ' ') | trim }}"
+
     - name: Install required packages
       ansible.builtin.apt:
         name:
-          - containerd=1.7.24-0ubuntu1~24.04.2
-          - runc=1.1.12-0ubuntu3.1
-          - kubeadm=1.32.4-1.1
-          - kubelet=1.32.4-1.1
-          - kubectl=1.32.4-1.1
+          - containerd={{ containerd_specific_version.split(' ')[0] }}
+          - runc={{ runc_specific_version.split(' ')[0] }}
+          - kubeadm={{ kubeadm_specific_version.split(' ')[0] }}
+          - kubelet={{ kubelet_specific_version.split(' ')[0] }}
+          - kubectl={{ kubectl_specific_version.split(' ')[0] }}
         state: present
         update_cache: yes
     
