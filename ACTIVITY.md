@@ -110,3 +110,71 @@
 - Created PR: https://github.com/remla2025-team9/operation/pull/40 (related to A5)
 - Approved PR: https://github.com/remla2025-team9/operation/pull/34 (related to A5)
 
+
+# Week 7
+
+### Timo
+- Created PR: https://github.com/remla2025-team9/app-frontend/pull/20 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
+
+### Raoul
+- Created PR: 
+- Approved PR: 
+
+### Artin
+- Created PR:
+- Approved PR: 
+
+### Shuang
+- Created PR: 
+- Approved PR: 
+
+### Lucian
+- Created PR: 
+- Approved PR: 
+
+
+# Week 8
+
+### Timo
+- Created PR:
+- Approved PR: 
+
+### Raoul
+- Created PR: 
+- Approved PR: 
+
+### Artin
+- Created PR:
+- Approved PR: 
+
+### Shuang
+- Created PR: 
+- Approved PR: 
+
+### Lucian
+- Created PR: 
+- Approved PR: 
+
+
+# Week 9
+
+### Timo
+- Created PR:
+- Approved PR: 
+
+### Raoul
+- Created PR: 
+- Approved PR: 
+
+### Artin
+- Created PR:
+- Approved PR: 
+
+### Shuang
+- Created PR: 
+- Approved PR: 
+
+### Lucian
+- Created PR: 
+- Approved PR: 
