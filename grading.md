@@ -39,6 +39,19 @@ We have structured this document by assignment, with a subsection for each rubri
 
 *   **Expected Level:** `[Your Expected Level]`
 *   **Implementation:**
+    - **(Sufficient)** Both libraries provide a `setup.py` for packaging and installation. Installation is done via `pip` directly from the GitHub repositories, this installation method ensures that both libraries are included via regular package managers rather than being referenced locally.
+    - **(Good)** The `lib-ml` repository contains core machine learning preprocessing logic, especially in the `preprocessing.py` module.  
+    - **(Good)** The `model-service` repository imports the `preprocess` function directly from the `sentiment_analysis_preprocessing` package, which is the same preprocessing logic used during training. 
+    - **(Excellent)** Model-service downloads model from external storage on startup:
+        ```bash
+        # In app/model_loader.py
+        model_version = os.getenv("MODEL_VERSION")
+        ```
+    - **(Excellent)** Model is cached in a directory:
+        ```bash
+        # In app/model_loader.py
+        model_path = f".cache/sentiment_pipeline-{model_version}.joblib"
+        ```
 *   **Notes for the Grader:**
 
 ### Exposing a Model via REST
@@ -78,6 +91,17 @@ We have structured this document by assignment, with a subsection for each rubri
 
 *   **Expected Level:** `[Your Expected Level]`
 *   **Implementation:**
+    - **(Sufficient)** The task Install required packages uses the `ansible.builtin.apt` module to install packages such as containerd, kubeadm, kubelet, and kubectl.
+    - **(Sufficient)** The task `Start and enable Kubelet service` uses the `ansible.builtin.systemd_service` module to start the kubelet service and enable it for auto-start on boot.
+    - **(Sufficient)** The task `Render the /etc/hosts file` uses the `ansible.builtin.template` module to generate and copy the /etc/hosts file from the hosts.j2 template onto the target VM.
+    - **(Sufficient)** Multiple tasks under Configure containerd use the `ansible.builtin.lineinfile` module to perform idempotent, regexp-based edits on /etc/containerd/config.toml.
+    - **(Good)** Multiple tasks under Configure containerd use the `ansible.builtin.lineinfile` module to perform idempotent, regexp-based edits on /etc/containerd/config.toml.
+    - **(Good)** The task `Check if containerd config` exists uses `ansible.builtin.stat` and `registers` the result as config_file, which is then used in subsequent conditional tasks to control execution flow.
+    - **(Good)** The task `Add Vagrant's SSH public keys` uses a loop with lookup('fileglob', ssh_key_pattern, wantlist=True) to iterate over multiple public key files and add each key.
+    - **(Good)** The playbook uses checks such as the presence of `/etc/containerd/config.toml` before writing default configuration and uses idempotent modules ensuring repeated runs do not reset cluster state.
+    - **(Excellent)** The task `Render the /etc/hosts file` uses the `ansible.builtin.template` module to generate and copy the /etc/hosts file from the hosts.j2 template onto the target VM.
+    - **(Excellent)** The task `Wait for MetalLB controller to be ready` uses the `ansible.builtin.command` module to run kubectl wait with a label selector and timeout, ensuring the playbook waits until the MetalLB controller pod is ready before continuing, preventing errors due to premature execution.
+    - **(Excellent)** Tasks such as `Remove SWAP from fstab` and those within Configure containerd use the `lineinfile` module with regexp to perform idempotent, regex-based edits on configuration files.
 *   **Notes for the Grader:**
 
 ### Setting up Kubernetes
