@@ -126,8 +126,8 @@
 - Approved PR: 
 
 ### Shuang
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/app-frontend/pull/20 (related to A1)
 
 ### Lucian
 - Created PR: 
