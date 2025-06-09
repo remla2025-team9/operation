@@ -130,8 +130,8 @@
 - Approved PR: https://github.com/remla2025-team9/app-frontend/pull/20 (related to A1)
 
 ### Lucian
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/operation/pull/49 (related to A2)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
 
 
 # Week 8
