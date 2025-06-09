@@ -93,10 +93,23 @@
       ansible.builtin.command: |
           kubectl apply -f yamls/dashboard-ingress.yaml
 
+    - name: Get system architecture
+      ansible.builtin.command: uname -m
+      register: system_architecture
+      changed_when: false
+
+    - name: Set Istio architecture fact
+      ansible.builtin.set_fact:
+        istio_arch: >-
+          {{
+            'arm64' if system_architecture.stdout in ['arm64', 'aarch64']
+            else 'amd64'
+          }}
+
     - name: Download Istio 1.25.2 tarball
       become_user: vagrant
       ansible.builtin.get_url:
-        url: https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-amd64.tar.gz
+        url: "https://github.com/istio/istio/releases/download/1.25.2/istio-1.25.2-linux-{{ istio_arch }}.tar.gz"
         dest: /home/vagrant/istio.tar.gz
         mode: '0644'
 
