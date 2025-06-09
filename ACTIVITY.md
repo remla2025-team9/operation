@@ -118,8 +118,8 @@
 - Approved PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
 
 ### Raoul
-- Created PR: 
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
+- Approved PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
 
 ### Artin
 - Created PR:
