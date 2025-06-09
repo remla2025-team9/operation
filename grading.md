@@ -62,9 +62,16 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Docker Compose Operation
 
-*   **Expected Level:** `[Your Expected Level]`
-*   **Implementation:**
-*   **Notes for the Grader:**
+* **Expected Level:** Excellent  
+* **Implementation:**  
+  (Sufficient) repository contains a docker-compose.yml that brings up app-service, model-service and app-frontend and makes app-service accessible from the host.  
+  (Good) defines a named volume model-cache for persistent caching.  
+  (Good) maps ports 5000:5000 for app-service and 3000:3000 for app-frontend.  
+  (Good) references the same container images as used in the Kubernetes deployment.  
+  (Excellent) each service has a `restart: on-failure` policy.  
+  (Excellent) Docker secret `example-secret` is defined under `secrets` and mounted into model-service.  
+  (Excellent) each service loads its own `env_file` for configuration.  
+* **Notes for the Grader:**  
 
 ---
 
@@ -106,19 +113,38 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Setting up Kubernetes
 
-*   **Expected Level:** `[Your Expected Level]`
-*   **Implementation:**
-*   **Notes for the Grader:**
+* **Expected Level:** Excellent  
+* **Implementation:**  
+  (Sufficient) control-plane is initialized via `kubeadm init` using Ansible when `/etc/kubernetes/admin.conf` does not exist.  
+  (Sufficient) worker nodes join the cluster automatically via a delegated `kubeadm token create --print-join-command` and subsequent `kubeadm join`.  
+  (Sufficient) the control-plane’s kubeconfig is copied to `/home/vagrant/.kube/config` for the vagrant user.  
+  (Sufficient) the kubeconfig is also fetched to the host system using an Ansible fetch task.  
+  (Good) tasks use idempotent checks (`stat`, `when`, and `changed_when`) to avoid re-running setup tasks unnecessarily.  
+  (Good) Flannel CNI plugin is installed by applying the `kube-flannel.yml` manifest.  
+  (Good) join command is dynamically generated on the controller and executed on all worker nodes via delegation.  
+  (Excellent) Ansible playbook installs and configures Helm (via apt_key, apt_repository, apt) and installs the Helm Diff plugin.  
+  (Excellent) the Kubernetes Dashboard is deployed and exposed via Ingress, making it accessible from the host without tunneling.  
+  (Excellent) MetalLB is configured with a fixed IP range, and the Istio ingress gateway receives an external IP from this pool.  
+  (Excellent) An HTTPS Ingress route is configured using cert-manager and self-signed certificates for secure dashboard access.  
+* **Notes for the Grader:**  
+
 
 ---
 
 ## Assignment 3
 
+
 ### Kubernetes Usage
 
-*   **Expected Level:** `[Your Expected Level]`
-*   **Implementation:**
-*   **Notes for the Grader:**
+* **Expected Level:** Excellent  
+* **Implementation:**  
+  (Sufficient) application is deployed to a Kubernetes cluster using Helm templates for each component.  
+  (Sufficient) Deployment and Service objects exist for app-service, app-frontend and model-service.  
+  (Sufficient) application is accessible through a VirtualService and Istio Gateway.  
+  (Good) environment variables in deployments point to the model-service hostname, making it reconfigurable via K8s config.  
+  (Good) a Secret is defined and referenced inside the pod templates.  
+  (Excellent) a hostPath volume is declared and mounted into the model-service pod, mapped from `/mnt/data/model-cache`.  
+* **Notes for the Grader:**  
 
 ### Helm Installation
 
