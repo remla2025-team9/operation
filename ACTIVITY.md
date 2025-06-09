@@ -122,8 +122,8 @@
 - Approved PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
 
 ### Artin
-- Created PR:
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/lib-version/pull/4 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
