@@ -54,9 +54,20 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Setting up (Virtual) Infrastructure
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - All VMs exist with correct hostnames, attached to a private network for inter-VM communication
+    - VMs are directly reachable from host through a host-only network (192.168.56.* range)
+    - VMs are provisioned with Ansible, completing within 5 minutes
+    - Vagrantfile uses loops and template arithmetic for defining node names and IPs
+    - Worker VM specifications are controlled via environment variables (WORKER_COUNT_ENV, WORKER_CPU_COUNT_ENV, WORKER_MEMORY_ENV)
+    - Extra arguments are passed to Ansible from Vagrant, including number of workers
+    - Vagrant generates a valid inventory.cfg for Ansible containing all active nodes
 *   **Notes for the Grader:**
+    - The Vagrantfile is in the `/vagrant` directory
+    - Environment variables can be found in the README.md documentation
+    - Ansible playbooks are in the `/vagrant/ansible` directory
+    - Host configuration is generated via the `hosts.j2` template
 
 ### Setting up Software Environment
 
