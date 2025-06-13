@@ -27,7 +27,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Automated Release Process
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Excellent)** After every push to main (and thus also after merging branches to main), the pre-version tag is automatically bumped using a counter (e.g. from `v0.0.1-pre-2` to `v0.0.1-pre-3`). This gives support for multiple versions of the same pre-release.
     - **(Excellent)**   We have implemented a deployment workflow that is triggered manually with the click of a button in the GitHub Actions tab for all repositories. The bump level (patch, minor, major) can be set for this workflow when triggering manually. If the previous version was a pre-release, the pre-tag is removed for the stable release (e.g. for a patch bump, `v0.0.1-pre-2` will become `v0.0.1`, and for a minor bump, `v0.0.1-pre-2` will become `v0.1.0`).
@@ -37,7 +37,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Software Reuse in Libraries
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Sufficient)** Both libraries provide a `setup.py` for packaging and installation. Installation is done via `pip` directly from the GitHub repositories, this installation method ensures that both libraries are included via regular package managers rather than being referenced locally.
     - **(Good)** The `lib-ml` repository contains core machine learning preprocessing logic, especially in the `preprocessing.py` module.  
@@ -97,7 +97,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Setting up Software Environment
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Sufficient)** The task Install required packages uses the `ansible.builtin.apt` module to install packages such as containerd, kubeadm, kubelet, and kubectl.
     - **(Sufficient)** The task `Start and enable Kubelet service` uses the `ansible.builtin.systemd_service` module to start the kubelet service and enable it for auto-start on boot.
@@ -161,8 +161,15 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Grafana
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** The `my-dashboard` in `grafana-dashboards` folder exists and illustrate all custom metrics.
+    - **(Sufficient)** The `my-dashboard` is a JSON fileand can be imported manually.
+    - **(Sufficient)** The README.md in operation repository contains relevant content to explain manual installation.
+    - **(Good)** The dashboard contains a Gauge panel to display the average number of reviews currently awaiting confirmation over the selected time interval. The Counter panel focuses on number of submitted reviews in recent periods.
+    - **(Good)** The dashboard uses time range variables like `$__interval` to make queries dynamically adjust based on the selected timeframe.
+    - **(Good)** Functions such as `avg_over_time` or `rate` are applied to smooth data, show trends, and provide meaningful insights.
+    - **(Excellent)** In  `grafana-dashboard-configmap.yaml` file, the configmap is defined to ensure that the dashboard is provisioned automatically during Helm installation, with no manual steps required to add it in the Grafana UI.
 *   **Notes for the Grader:**
 
 ---
@@ -211,8 +218,10 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Additional Use Case
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Excellent)** In `rate-limiting.yaml`, Rate limiting is configured using Istio's EnvoyFilter and a custom ConfigMap. The ratelimit-config defines a global rule that limits incoming requests to 10 per minute based on the request path. EnvoyFilters inject the Envoy Rate Limit HTTP filter into the ingress gateway and match it to the defined rules. The configuration ensures that traffic through the Istio ingress is dynamically rate-limited via a gRPC rate limit service.
+
 *   **Notes for the Grader:**
 
 ### Continuous Experimentation
