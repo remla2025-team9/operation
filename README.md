@@ -2,6 +2,20 @@
 
 This repository helps connect and run the services developed by REMLA 2025 Team 9. The application can be run either using Docker Compose locally or deployed to a Kubernetes cluster using Minikube and Helm.
 
+## Repositories
+
+Each repository has a `README.md` file with information about running. Below is a summary of each repository:
+
+| Repository                                                          | Description                                                                                                                                                                                                                        |
+|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [model-training](https://github.com/remla2025-team9/model-training) | Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.                                                                                                                       |
+| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.                                                                               |
+| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.                                                                                                         |
+| [app-service](https://github.com/remla2025-team9/app-service)       | Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing. |
+| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
+| [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
+| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments  |
+
 ## Option 1: Running with Docker Compose
 
 Make sure Docker and Docker Compose are installed. Then:
@@ -36,7 +50,7 @@ If you're using GitHub Container Registry (GHCR) images and encounter permission
 echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 ```
 
-## Option 2: Running with Minikube and Helm
+## Option 2: Running with Minikube
 
 ### Prerequisites
 - Minikube
@@ -174,60 +188,15 @@ minikube stop
   ```
   If over 10 requests are made within one minute, subsequent ones should return a 429 Too Many Requests error.
 
----
-### Check Prometheus and Grafana with Helm
+## Option 3: Provisioning VMs with Vagrant and Ansible
 
-Ensure the `prometheus-community` Helm repository is added to your local Helm setup, check it by running:
+### Prerequisites
+- Vagrant
+- Ansible
+- Helm
+- kubectl
+- VirtualBox
 
-```bash
-helm repo list
-```
-
-Ensure `my-app-grafana` in the pod, check it by running:
-
-```bash
-kubectl get svc -n default
-```
-
-### Accessing Grafana Dashboard in Minikube
-
-1. Access Grafana UI using port forwarding:
-```bash
-kubectl port-forward -n default svc/my-app-grafana 1234:80
-```
-
-- Navigate to: http://localhost:1234
-
-2. Log in to Grafana
-- Default credentials:
-  - Username: `admin`
-  - Password: `prom-operator` (for kubernetes cluster deployment)
-
-Note: The port number (1234) can be changed to any available port on your local machine.
-
-3. Import the Dashboard
-- In the Grafana UI:
-  1. Go to **Dashboards** in the left sidebar
-  2. Click **New** → **Import**
-  3. Upload the dashboard JSON file or paste the JSON content
----
-
-## Repositories
-
-Each repository has a `README.md` file with information about running. Below is a summary of each repository:
-
-| Repository                                                          | Description                                                                                                                                                                                                                        |
-|---------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [model-training](https://github.com/remla2025-team9/model-training) | Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.                                                                                                                       |
-| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.                                                                               |
-| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.                                                                                                         |
-| [app-service](https://github.com/remla2025-team9/app-service)       | Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing. |
-| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
-| [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
-| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
-
-
-## Provision
 
 ### Environment variables
 
@@ -296,3 +265,54 @@ Afterwards, you can find the kubernetes configuration file in `config/.kubeconfi
 ```bash
 kubectl --kubeconfig config/.kubeconfig ...
 ```
+
+### Install Helm chart
+
+```
+helm install --namespace app --create-namespace restaurant ./app-helm-chart
+```
+
+### Configure /etc/hosts
+
+**Linux/macOS**:
+```bash
+# Replace hostnames if you changed them in values.yaml
+sudo sh -c "echo '192.168.56.91 app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local' >> /etc/hosts"
+
+# Check if the hostnames are correctly added to the /etc/hosts file
+cat /etc/hosts
+```
+
+**Windows** (Run PowerShell as Administrator):
+```powershell
+Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "192.168.56.91 app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local"
+```
+
+### Access application
+
+Now, you can access the frontend of the application by just going to `app-frontend.k8s.local` in your browser.
+
+---
+
+## Accessing Grafana Dashboard
+
+1. Access Grafana UI using port forwarding:
+```bash
+kubectl port-forward -n '<app-namespace>' svc/<app-name>-grafana 1234:80
+```
+
+- Navigate to: http://localhost:1234
+
+2. Log in to Grafana
+- Default credentials:
+  - Username: `admin`
+  - Password: `prom-operator` (for kubernetes cluster deployment)
+
+Note: The port number (1234) can be changed to any available port on your local machine.
+
+3. Import the Dashboard
+- In the Grafana UI:
+  1. Go to **Dashboards** in the left sidebar
+  2. Click **New** → **Import**
+  3. Upload the dashboard JSON file or paste the JSON content
+---                  
