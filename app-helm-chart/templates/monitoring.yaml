@@ -38,3 +38,54 @@ spec:
           annotations:
             summary: "High number of reviews submitted"
             description: "More than 5 reviews have been submitted in the last 5 minutes."
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-secret
+  namespace: {{ .Release.Namespace }}
+type: Opaque
+stringData:
+  smtp_auth_username: {{ .Values.alertCreds.username | quote }}
+  smtp_auth_password: {{ .Values.alertCreds.password | quote }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Alertmanager
+metadata:
+  name: reviews-submitted-alertmanager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  image: quay.io/prometheus/alertmanager:v0.25.0  # Specify image as string
+  version: v0.25.0  # Add version
+  replicas: 1
+  configSecret: alertmanager-config
+  serviceAccountName: prometheus-k8s
+  routePrefix: /
+  securityContext:
+    fsGroup: 2000
+    runAsNonRoot: true
+    runAsUser: 1000
+---
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: email-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    alertmanagerConfig: main
+spec:
+  route:
+    receiver: email-receiver
+  receivers:
+    - name: email-receiver
+      emailConfigs:
+        - to: remla2025team9.alerts@gmail.com
+          from: {{ .Values.alertCreds.username }}
+          smarthost: smtp.gmail.com:587
+          authUsername: {{ .Values.alertCreds.username }}
+          authPassword:
+            name: alertmanager-secret
+            key: smtp_auth_password
+          requireTLS: true
