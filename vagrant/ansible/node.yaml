@@ -2,6 +2,11 @@
 - hosts: nodes
   become: true
   tasks: 
+    - name: Check if kubeconfig exists
+      ansible.builtin.stat:
+        path: /etc/kubernetes/kubelet.conf
+      register: kubeconfig_file
+
     - name: Generate kubeadm join command on controller
       ansible.builtin.command: kubeadm token create --print-join-command
       register: kubeadm_join_command
@@ -12,6 +17,8 @@
       vars:
         ansible_delegated_vars:
           ansible_become: yes 
+      when: not kubeconfig_file.stat.exists
 
     - name: Join worker nodes to the Kubernetes cluster
       ansible.builtin.shell: " {{ kubeadm_join_command.stdout }} "
+      when: not kubeconfig_file.stat.exists
