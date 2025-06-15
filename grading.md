@@ -148,7 +148,8 @@ We have structured this document by assignment, with a subsection for each rubri
   - **(Sufficient)** application is accessible through a VirtualService and Istio Gateway.  
   - **(Good)** environment variables in deployments point to the model-service hostname, making it reconfigurable via K8s config.  
   - **(Good)** a Secret is defined and referenced inside the pod templates.  
-  - **(Excellent)** a hostPath volume is declared and mounted into the model-service pod, mapped from `/mnt/data/model-cache`.  
+  - **(Excellent)** a hostPath volume is declared and mounted into the model-service pod, mapped from `/mnt/shared/model-cache`.  
+  - **(Excellent)** Shared folder mounted at `/mnt/shared`
 * **Notes for the Grader:**  
 
 ### Helm Installation
