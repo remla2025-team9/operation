@@ -57,8 +57,12 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Exposing a Model via REST
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** Service is implemented using Flask and received REST requests.
+    - **(Good)** The host and port of the Flask app are confiurable through an ENV variable.
+    - **(Good)** Endpoints have OpenAPI specification.
+    - **(Excellent)** The port is configurable.
 *   **Notes for the Grader:**
 
 ### Docker Compose Operation
