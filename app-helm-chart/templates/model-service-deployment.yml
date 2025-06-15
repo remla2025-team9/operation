@@ -50,7 +50,7 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc-{{ .Values.modelService.stable.versionLabel }}
+            claimName: {{ .Release.Name }}-model-cache-pvc-{{ .Values.modelService.stable.versionLabel }}
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
@@ -111,7 +111,7 @@ spec:
       volumes:
         - name: model-cache-storage
           persistentVolumeClaim:
-            claimName: model-cache-pvc-{{ .Values.modelService.canary.versionLabel }}
+            claimName: {{ .Release.Name }}-model-cache-pvc-{{ .Values.modelService.canary.versionLabel }}
         # - name: model-secrets-volume
         #   secret:
         #     secretName: {{ .Values.modelService.secretName | default "example-secret" }}
