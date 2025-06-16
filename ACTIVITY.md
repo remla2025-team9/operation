@@ -137,8 +137,8 @@
 # Week 8
 
 ### Timo
-- Created PR:
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/app-service/pull/18 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/52 (related to A3)
 
 ### Raoul
 - Created PR: https://github.com/remla2025-team9/operation/pull/54 (related to A3)
