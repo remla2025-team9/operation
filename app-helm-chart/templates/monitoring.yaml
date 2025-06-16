@@ -57,16 +57,12 @@ metadata:
   labels:
     release: {{ .Release.Name }}
 spec:
-  image: quay.io/prometheus/alertmanager:v0.25.0  # Specify image as string
-  version: v0.25.0  # Add version
+  image: quay.io/prometheus/alertmanager:v0.25.0
+  version: v0.25.0
   replicas: 1
   configSecret: alertmanager-config
   serviceAccountName: prometheus-k8s
   routePrefix: /
-  securityContext:
-    fsGroup: 2000
-    runAsNonRoot: true
-    runAsUser: 1000
 ---
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
