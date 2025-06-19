@@ -67,7 +67,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Docker Compose Operation
 
-* **Expected Level:** Excellent  
+* **Expected Level:** `Excellent`
 * **Implementation:**  
   - **(Sufficient)** repository contains a docker-compose.yml that brings up app-service, model-service and app-frontend and makes app-service accessible from the host.  
   - **(Good)** defines a named volume model-cache for persistent caching.  
@@ -118,7 +118,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Setting up Kubernetes
 
-* **Expected Level:** Excellent  
+* **Expected Level:** `Excellent`  
 * **Implementation:**  
   - **(Sufficient)** control-plane is initialized via `kubeadm init` using Ansible when `/etc/kubernetes/admin.conf` does not exist.  
   - **(Sufficient)** worker nodes join the cluster automatically via a delegated `kubeadm token create --print-join-command` and subsequent `kubeadm join`.  
@@ -141,7 +141,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Kubernetes Usage
 
-* **Expected Level:** Excellent  
+* **Expected Level:** `Excellent`
 * **Implementation:**  
   - **(Sufficient)** application is deployed to a Kubernetes cluster using Helm templates for each component.  
   - **(Sufficient)** Deployment and Service objects exist for app-service, app-frontend and model-service.  
@@ -183,7 +183,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Automated Tests
 
-*   **Expected Level:** Excellent
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Sufficient)** Tests follows `ML Tests Score` methodology, tests cover four aspects: Feature and Data; Model Development; ML infrastructure;
     Monitoring tests.
