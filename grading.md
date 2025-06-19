@@ -183,8 +183,17 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Automated Tests
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** Excellent
 *   **Implementation:**
+    - **(Sufficient)** Tests follows `ML Tests Score` methodology, tests cover four aspects: Feature and Data; Model Development; ML infrastructure;
+    Monitoring tests.
+    - **(Sufficient)** For Feature and Data: the `test_data.py` consists of tests primarily verify the validity and quality of features and data, including checks on feature structure (e.g., sparsity, non-negativity, absence of NaNs/Infs), label correctness (e.g., binary, balanced), and data processing integrity and efficiency (e.g., matching dimensions, duplicates, preprocessing speed). For Model Development: the `test_development.py` consists of tests ensure that the trained model performs better than a simple baseline (majority class) classifier. For ML infrastructure: the `test_infrastructure.py` has test to run the DVC pipeline and verify it produces a valid model and metrics. For Monitoring: the `test_monitoring.py` has tests monitor the runtime duration and memory usage.
+    - **(Sufficient)** The name of the file indicates the category of tests and there are comment for tests.
+    - **(Good)** The `test_non-determinism.py` have test checks the stability of model accuracy across different random seeds, ensuring that performance does not vary much. The `test_data_slices.py` consists of tests evaluate the trained model’s accuracy on the entire test set as well as separately on positive and negative reviews, ensuring it performs reasonably across all cases.
+    - **(Good)** The `test_feature_cost.py` have tests to evaluate the prediction efficiency of the model by measuring its latency and peak memory usage during inference on the test set, ensuring both stay within acceptable limits.
+    - **(Excellent)** Using pytest together with the pytest-cov plugin, test adequacy is measured and reported on the terminal when running the tests.
+    - **(Excellent)** The coverage is automatically meausred using `pytest --cov=src tests/`.
+    - **(Excellent)** The `test_mutamorphic.py` have tests to check whether the model maintains consistent predictions when sentiment-related words are replaced with synonyms, and attempts to "repair" misclassifications caused by such changes.
 *   **Notes for the Grader:**
 
 ### Continuous Training
