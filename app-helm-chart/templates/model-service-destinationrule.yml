@@ -1,9 +1,9 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: model-service-dr
+  name: {{ .Values.modelService.name }}-dr
 spec:
-  host: model-service
+  host: {{ .Values.modelService.name }}
   trafficPolicy:
     loadBalancer:
       consistentHash:

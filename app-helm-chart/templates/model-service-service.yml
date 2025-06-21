@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: model-service
+  name: {{ .Values.modelService.dns-name }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
 spec:
   ports:
     - port: {{ .Values.modelService.port }}
       targetPort: {{ .Values.modelService.port }}
   selector:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}

@@ -1,5 +1,7 @@
 # model-service settings
 modelService:
+  # This setting is used to set the DNS name for the model service as required by the assignment.
+  dns-name: model-service
   replicas: 1
   stable:
     versionLabel: stable
@@ -68,7 +70,7 @@ appFrontend:
       tag: latest
     config:
       APP_SERVICE_URL: "http://app-service.k8s.local"
-  canary: 
+  canary:
     enabled: true
     versionLabel: "canary"
     image:
@@ -91,17 +93,17 @@ appSecret:
 # grafana settings
 grafana:
   dashboardProviders:
-   dashboardproviders.yaml:
-     apiVersion: 1
-     providers:
-     - name: 'default'
-       orgId: 1
-       folder: ''
-       type: file
-       disableDeletion: false
-       editable: true
-       options:
-         path: /var/lib/grafana/dashboards/default
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: "default"
+          orgId: 1
+          folder: ""
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
 
   dashboardsConfigMaps:
     default: "grafana-dashboards"

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: model-service-config-{{ .Values.modelService.stable.versionLabel }}
+  name: {{ .Values.modelService.dns-name }}-config-{{ .Values.modelService.stable.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
     version: {{ .Values.modelService.stable.versionLabel }}
 data:
   {{- range $key, $val := .Values.modelService.stable.config }}
@@ -13,31 +13,31 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment-{{ .Values.modelService.stable.versionLabel }}
+  name: {{ .Values.modelService.dns-name }}-deployment-{{ .Values.modelService.stable.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
 spec:
   replicas: {{ .Values.modelService.replicas }}
   selector:
     matchLabels:
-      app: model-service
+      app: {{ .Values.modelService.dns-name }}
       version: {{ .Values.modelService.stable.versionLabel }}
   template:
     metadata:
       labels:
-        app: model-service
+        app: {{ .Values.modelService.dns-name }}
         version: {{ .Values.modelService.stable.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: model-service
+        - name: {{ .Values.modelService.dns-name }}
           image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.stable.image.tag }}"
           imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.modelService.port }}
           envFrom:
             - configMapRef:
-                name: model-service-config-{{ .Values.modelService.stable.versionLabel }}
+                name: {{ .Values.modelService.dns-name }}-config-{{ .Values.modelService.stable.versionLabel }}
           # env:
           #   - name: SECRETS_FILE
           #     value: "/etc/model-secrets/example-secret.txt" # Path where the secret file is mounted
@@ -62,9 +62,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: model-service-config-{{ .Values.modelService.canary.versionLabel }}
+  name: {{ .Values.modelService.dns-name }}-config-{{ .Values.modelService.canary.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
     version: {{ .Values.modelService.canary.versionLabel }}
 data:
   {{- range $key, $val := .Values.modelService.canary.config }}
@@ -74,31 +74,31 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: model-service-deployment-{{ .Values.modelService.canary.versionLabel }}
+  name: {{ .Values.modelService.dns-name }}-deployment-{{ .Values.modelService.canary.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
 spec:
   replicas: {{ .Values.modelService.replicas }}
   selector:
     matchLabels:
-      app: model-service
+      app: {{ .Values.modelService.dns-name }}
       version: {{ .Values.modelService.canary.versionLabel }}
   template:
     metadata:
       labels:
-        app: model-service
+        app: {{ .Values.modelService.dns-name }}
         version: {{ .Values.modelService.canary.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: model-service
+        - name: {{ .Values.modelService.dns-name }}
           image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.canary.image.tag }}"
           imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.modelService.port }}
           envFrom:
             - configMapRef:
-                name: model-service-config-{{ .Values.modelService.canary.versionLabel }}
+                name: {{ .Values.modelService.dns-name }}-config-{{ .Values.modelService.canary.versionLabel }}
           # env:
           #   - name: SECRETS_FILE
           #     value: "/etc/model-secrets/example-secret.txt" # Path where the secret file is mounted

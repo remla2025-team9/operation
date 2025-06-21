@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: model-cache-pv-{{ .Values.modelService.stable.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
 spec:
   capacity:
     storage: {{ .Values.modelService.persistence.size }}
@@ -19,7 +19,7 @@ kind: PersistentVolume
 metadata:
   name: model-cache-pv-{{ .Values.modelService.canary.versionLabel }}
   labels:
-    app: model-service
+    app: {{ .Values.modelService.dns-name }}
 spec:
   capacity:
     storage: {{ .Values.modelService.persistence.size }}
