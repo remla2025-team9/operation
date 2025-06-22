@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-frontend-config-{{ .Values.appFrontend.stable.versionLabel }}
+  name: {{ .Release.Name }}-app-frontend-config-{{ .Values.appFrontend.stable.versionLabel }}
   labels:
-    app: {{ .Release.Name }}-frontend
+    app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.appFrontend.stable.versionLabel }}
 data:
   {{- range $key, $val := .Values.appFrontend.stable.config }}
@@ -13,40 +13,40 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-frontend-deployment-{{ .Values.appFrontend.stable.versionLabel }}
+  name: {{ .Release.Name }}-app-frontend-deployment-{{ .Values.appFrontend.stable.versionLabel }}
   labels:
-    app: app-frontend
+    app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.appFrontend.stable.versionLabel }}
 spec:
   replicas: {{ .Values.appFrontend.replicas }}
   selector:
     matchLabels:
-      app: app-frontend
+      app: {{ .Release.Name }}-app-frontend
       version: {{ .Values.appFrontend.stable.versionLabel }}
   template:
     metadata:
       labels:
-        app: app-frontend
+        app: {{ .Release.Name }}-app-frontend
         version: {{ .Values.appFrontend.stable.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: app-frontend
+        - name: {{ .Release.Name }}-app-frontend
           image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.stable.image.tag }}"
           imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appFrontend.port }}
           envFrom:
             - configMapRef:
-                name: {{ .Release.Name }}-frontend-config-{{ .Values.appFrontend.stable.versionLabel }}
+                name: {{ .Release.Name }}-app-frontend-config-{{ .Values.appFrontend.stable.versionLabel }}
 {{- if .Values.appFrontend.canary.enabled }}
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-frontend-config-{{ .Values.appFrontend.canary.versionLabel }}
+  name: {{ .Release.Name }}-app-frontend-config-{{ .Values.appFrontend.canary.versionLabel }}
   labels:
-    app: {{ .Release.Name }}-frontend
+    app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.appFrontend.canary.versionLabel }}
 data:
   {{- range $key, $val := .Values.appFrontend.canary.config }}
@@ -56,30 +56,30 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-frontend-deployment-{{ .Values.appFrontend.canary.versionLabel }}
+  name: {{ .Release.Name }}-app-frontend-deployment-{{ .Values.appFrontend.canary.versionLabel }}
   labels:
-    app: app-frontend
+    app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.appFrontend.canary.versionLabel }}
 spec:
   replicas: {{ .Values.appFrontend.replicas }}
   selector:
     matchLabels:
-      app: app-frontend
+      app: {{ .Release.Name }}-app-frontend
       version: {{ .Values.appFrontend.canary.versionLabel }}
   template:
     metadata:
       labels:
-        app: app-frontend
+        app: {{ .Release.Name }}-app-frontend
         version: {{ .Values.appFrontend.canary.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: app-frontend
+        - name: {{ .Release.Name }}-app-frontend
           image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.canary.image.tag }}"
           imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appFrontend.port }}
           envFrom:
             - configMapRef:
-                name: {{ .Release.Name }}-frontend-config-{{ .Values.appFrontend.canary.versionLabel }}
+                name: {{ .Release.Name }}-app-frontend-config-{{ .Values.appFrontend.canary.versionLabel }}
 {{- end }}

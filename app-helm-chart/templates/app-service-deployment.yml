@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-service-config-{{ .Values.appService.stable.versionLabel }}
+  name: {{ .Release.Name }}-app-service-config-{{ .Values.appService.stable.versionLabel }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     version: {{ .Values.appService.stable.versionLabel }}
 data:
   {{- range $key, $val := .Values.appService.stable.config }}
@@ -13,32 +13,32 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-deployment-{{ .Values.appService.stable.versionLabel }}
+  name: {{ .Release.Name }}-app-service-deployment-{{ .Values.appService.stable.versionLabel }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     version: {{ .Values.appService.stable.versionLabel }}
 spec:
   replicas: {{ .Values.appService.replicas }}
   selector:
     matchLabels:
-      app: app-service
+      app: {{ .Release.Name }}-app-service
       version: {{ .Values.appService.stable.versionLabel }}
   template:
     metadata:
       labels:
-        app: app-service
+        app: {{ .Release.Name }}-app-service
         version: {{ .Values.appService.stable.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: app-service
+        - name: {{ .Release.Name }}-app-service
           image: "{{ .Values.appService.image.repository }}:{{ .Values.appService.stable.image.tag }}"
           imagePullPolicy: {{ .Values.appService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appService.port }}
           envFrom:
             - configMapRef:
-                name: app-service-config-{{ .Values.appService.stable.versionLabel }}
+                name: {{ .Release.Name }}-app-service-config-{{ .Values.appService.stable.versionLabel }}
           env:
             - name: API_KEY
               valueFrom:
@@ -50,9 +50,9 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: app-service-config-{{ .Values.appService.canary.versionLabel }}
+  name: {{ .Release.Name }}-app-service-config-{{ .Values.appService.canary.versionLabel }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     version: {{ .Values.appService.canary.versionLabel }}
 data:
   {{- range $key, $val := .Values.appService.canary.config }}
@@ -62,32 +62,32 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-service-deployment-{{ .Values.appService.canary.versionLabel }}
+  name: {{ .Release.Name }}-app-service-deployment-{{ .Values.appService.canary.versionLabel }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     version: {{ .Values.appService.canary.versionLabel }}
 spec:
   replicas: {{ .Values.appService.replicas }}
   selector:
     matchLabels:
-      app: app-service
+      app: {{ .Release.Name }}-app-service
       version: {{ .Values.appService.canary.versionLabel }}
   template:
     metadata:
       labels:
-        app: app-service
+        app: {{ .Release.Name }}-app-service
         version: {{ .Values.appService.canary.versionLabel }}
     spec:
       restartPolicy: Always
       containers:
-        - name: app-service
+        - name: {{ .Release.Name }}-app-service
           image: "{{ .Values.appService.image.repository }}:{{ .Values.appService.canary.image.tag }}"
           imagePullPolicy: {{ .Values.appService.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.appService.port }}
           envFrom:
             - configMapRef:
-                name: app-service-config-{{ .Values.appService.canary.versionLabel }}
+                name: {{ .Release.Name }}-app-service-config-{{ .Values.appService.canary.versionLabel }}
           env:
             - name: API_KEY
               valueFrom:

@@ -1,15 +1,15 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: app-frontend-virtualservice
+  name: {{ .Release.Name }}-app-frontend-virtualservice
   namespace: {{ .Values.namespace }}
   labels:
-    app: app-frontend
+    app: {{ .Release.Name }}-app-frontend
 spec:
   hosts:
     - {{ .Values.appFrontend.ingress.host | quote }}
   gateways:
-    - my-istio-gateway
+    - {{ .Release.Name }}-my-istio-gateway
   http:
     - name: "route-if-stable-cookie"
       match:
@@ -18,7 +18,7 @@ spec:
               regex: ".*app-frontend-version={{ .Values.appFrontend.stable.versionLabel }}.*"
       route:
         - destination:
-            host: app-frontend
+            host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.stable.versionLabel }}
@@ -29,14 +29,14 @@ spec:
               regex: ".*app-frontend-version={{ .Values.appFrontend.canary.versionLabel }}.*"
       route:
         - destination:
-            host: app-frontend
+            host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.canary.versionLabel }}
     - name: "default-route-and-set-cookie"
       route:
         - destination:
-            host: app-frontend
+            host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.stable.versionLabel }}
@@ -46,7 +46,7 @@ spec:
               add:
                 "Set-Cookie": "app-frontend-version={{ .Values.appFrontend.stable.versionLabel }}; Path=/; Max-Age=2592000"
         - destination:
-            host: app-frontend
+            host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
             subset: {{ .Values.appFrontend.canary.versionLabel }}

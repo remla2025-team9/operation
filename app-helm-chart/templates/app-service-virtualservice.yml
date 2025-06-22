@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: app-service-vs
+  name: {{ .Release.Name }}-app-service-vs
 spec:
   hosts:
     - {{ .Values.appService.stable.host | quote }}
@@ -9,14 +9,14 @@ spec:
     - {{ .Values.appService.canary.host | quote }}
     {{- end }}
   gateways:
-    - my-istio-gateway
+    - {{ .Release.Name }}-my-istio-gateway
   http:
     - match:
         - authority:
             exact: {{ .Values.appService.stable.host | quote }}
       route:
         - destination:
-            host: app-service
+            host: {{ .Release.Name }}-app-service
             subset: {{ .Values.appService.stable.versionLabel }}
     
     {{- if .Values.appService.canary.enabled }}
@@ -25,6 +25,6 @@ spec:
             exact: {{ .Values.appService.canary.host | quote }}
       route:
         - destination:
-            host: app-service
+            host: {{ .Release.Name }}-app-service
             subset: {{ .Values.appService.canary.versionLabel }}
     {{- end }}

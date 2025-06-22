@@ -1,9 +1,9 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: app-frontend-dr
+  name: {{ .Release.Name }}-app-frontend-dr
 spec:
-  host: app-frontend
+  host: {{ .Release.Name }}-app-frontend
   # trafficPolicy:
   #   loadBalancer:
   #     consistentHash:

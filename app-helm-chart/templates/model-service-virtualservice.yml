@@ -1,20 +1,20 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ .Values.modelService.dns-name }}-vs
+  name: {{ .Release.Name }}-{{ .Values.modelService.dns-name }}-vs
 spec:
   hosts:
-    - {{ .Values.modelService.dns-name }}
+    - {{ .Release.Name }}-{{ .Values.modelService.dns-name }}
   http:
     - match:
         - sourceLabels:
-            app: app-service
+            app: {{ .Release.Name }}-app-service
             version: {{ .Values.appService.canary.versionLabel }}
       route:
         - destination:
-            host: {{ .Values.modelService.dns-name }}
+            host: {{ .Release.Name }}-{{ .Values.modelService.dns-name }}
             subset: {{ .Values.modelService.canary.versionLabel }}
     - route:
         - destination:
-            host: {{ .Values.modelService.dns-name }}
+            host: {{ .Release.Name }}-{{ .Values.modelService.dns-name }}
             subset: {{ .Values.modelService.stable.versionLabel }}
