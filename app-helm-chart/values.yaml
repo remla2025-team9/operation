@@ -65,12 +65,16 @@ appFrontend:
   replicas: 1
   stable:
     versionLabel: "stable"
+    # The destinationWeight is used to control the traffic split between stable and canary versions.
+    destinationWeight: 10
     image:
       tag: latest
     config:
       APP_SERVICE_URL: "http://app-service.k8s.local"
   canary:
     enabled: true
+    # The destinationWeight is used to control the traffic split between stable and canary versions.
+    destinationWeight: 90
     versionLabel: "canary"
     image:
       tag: canary
