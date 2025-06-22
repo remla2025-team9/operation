@@ -173,7 +173,7 @@
 
 ### Shuang
 - Created PR: https://github.com/remla2025-team9/model-training/pull/18 (related to A4)
-- Approved PR: https://github.com/remla2025-team9/app-frontend/pull/21 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
 
 ### Lucian
 - Created PR: 
