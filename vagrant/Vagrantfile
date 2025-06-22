@@ -17,6 +17,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "bento/ubuntu-24.04"
     config.ssh.insert_key = false
 
+    config.vm.synced_folder "./shared", "/mnt/shared", create: true
+
     # Create inventory file on the host machine first
     File.open("inventory.cfg", "w") do |f|
         f.puts "[control]"
