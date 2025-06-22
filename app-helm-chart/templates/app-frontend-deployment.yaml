@@ -6,6 +6,7 @@ metadata:
     app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.versions.stable.versionLabel }}
 data:
+  APP_SERVICE_URL: "http://{{ .Values.appService.ingress.host }}:{{ .Values.appService.service.port}}"
   {{- range $key, $val := .Values.appFrontend.stable.config }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}
@@ -49,6 +50,7 @@ metadata:
     app: {{ .Release.Name }}-app-frontend
     version: {{ .Values.versions.canary.versionLabel }}
 data:
+  APP_SERVICE_URL: "http://{{ .Values.appService.ingress.host }}:{{ .Values.appService.service.port}}"
   {{- range $key, $val := .Values.appFrontend.canary.config }}
   {{ $key }}: {{ $val | quote }}
   {{- end }}

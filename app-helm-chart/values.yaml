@@ -3,16 +3,13 @@ versions:
   stable:
     versionLabel: "stable"
     # The destinationWeight is used to control the traffic split between stable and canary versions.
-    destinationWeight: 50
+    destinationWeight: 90
   canary:
     # This setting enables canary deployments for every service that supports it.
     enabled: true
     versionLabel: "canary"
     # The destinationWeight is used to control the traffic split between stable and canary versions.
-    destinationWeight: 50
-  stickySession:
-    cookieName: "app-version" # The name of the cookie used for sticky sessions
-    cookieDomain: ".k8s.local" # The domain for the sticky session cookie
+    destinationWeight: 10
 
 # model-service settings
 modelService:
@@ -83,7 +80,7 @@ appFrontend:
     image:
       tag: latest
     config:
-      APP_SERVICE_URL: "http://app-service.k8s.local"
+      # Additional environment variables for the stable version of the app frontend. Currently empty.
   # Canary deployment settings specific to the app frontend.
   canary:
     # This setting enables a canary deployment for the app frontend.
@@ -91,7 +88,7 @@ appFrontend:
     image:
       tag: canary
     config:
-      APP_SERVICE_URL: "http://app-service.k8s.local"
+      # Additional environment variables for the stable version of the app frontend. Currently empty.
   image:
     repository: ghcr.io/remla2025-team9/app-frontend
     pullPolicy: Always

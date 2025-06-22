@@ -45,7 +45,7 @@ Users routed to this `canary` stack via Istio's traffic management will form our
 
 The image below presents an example of the UI of the new feature in the app-frontend:
 
-![Demo Confidence Score](demo_confidence_score.png)
+![Demo Confidence Score](images/demo_confidence_score.png)
 
 ## 4. Hypothesis
 
@@ -54,7 +54,7 @@ We propose the following falsifiable hypothesis:
 *   **Primary Hypothesis (H1):** *Displaying the model's confidence score will lead to an **increase** in the overall rate of manual corrections made by users. This is anticipated because transparency into the model's certainty (especially when low) will empower users to correct predictions they perceive as inaccurate or weakly supported, which they might have otherwise let pass.*
     *   **Rationale:** When users see that the model itself is not highly confident in a prediction (e.g., "Positive, 60% confidence"), and this prediction mismatches their own assessment, they may feel more justified or encouraged to make a correction. While high-confidence scores might deter some corrections, we suspect the effect of low-confidence scores encouraging corrections will be more dominant, leading to a net increase. This could ultimately improve the quality of user-validated data.
 
-*   **Null Hypothesis (H0):** *Displaying the confidence score will have no statistically significant impact on the overall rate of user-initiated manual corrections.*
+*   **Null Hypothesis (H0):** *Displaying the confidence score will have no significant impact on the overall rate of user-initiated manual corrections.*
 
 ## 5. Metrics for Evaluation
 
@@ -97,10 +97,23 @@ These metrics monitor the health and performance of the application versions.
 
 *   **Traffic Splitting:** We will use Istio to manage traffic. Initially, a small percentage of user traffic (e.g., 10%) will be directed to the `canary` stack, while the remaining 90% will continue to use the `stable` stack. This will be configured using Istio `VirtualService` and `DestinationRule` resources for each of the three services (`app-frontend`, `app-service`, `model-service`) to ensure consistent routing (i.e., a user hitting `app-frontend-canary` will use `app-service-canary` and `model-service-canary`).
 
-*   **Sticky Sessions:** To ensure a consistent user experience and the integrity of our experimental data, sticky sessions will be implemented for the `app-frontend`. This is achieved via an Istio `VirtualService` for `app-frontend` that inspects and sets a cookie:
-    *   If a request has a cookie `app-frontend-version=stable`, it's routed to the `stable` `app-frontend` subset.
-    *   If a request has a cookie `app-frontend-version=canary`, it's routed to the `canary` `app-frontend` subset.
-    *   For new users without this cookie, the `VirtualService` routes them to either the `stable` or `canary` subset based on the defined weights (e.g., 90% stable, 10% canary for the start of the experiment) and adds a `Set-Cookie: app-frontend-version=<chosen_version>` header to the response. This ensures subsequent requests from that user are "stuck" to the initially assigned version for the duration of the cookie's validity.
+*   **Sticky Sessions:** To ensure a consistent user experience and the integrity of our experimental data, we've implemented a multi-layered approach to session consistency across the service stack:
+
+    1. **Frontend Routing (Cookie-based):**
+       *   If a request has a cookie `{{ .Release.Name }}-app-version=stable`, it's routed to the `stable` `app-frontend` subset.
+       *   If a request has a cookie `{{ .Release.Name }}-app-version=canary`, it's routed to the `canary` `app-frontend` subset.
+       *   For new users without this cookie, the `VirtualService` routes them based on defined weights (e.g., 90% stable, 10% canary) and adds a `Set-Cookie` header to establish persistence.
+
+    2. **Backend Routing (Header-based):**
+       *   The `app-service` routing is based on an `X-App-Version` header rather than cookies.
+       *   When the `app-frontend` makes requests to the `app-service`, it sets the `X-App-Version` header based on the cookie value it received.
+       *   This header-based approach was necessary because browser requests don't automatically forward cookies across different domains/services.
+       *   Direct API consumers (e.g., Postman) can achieve sticky sessions for the backend by consistently using the same `X-App-Version` header in their requests.
+
+    3. **Model Service Routing:**
+       *   The `model-service` is internal and only accessible from within the cluster by the `app-service`.
+       *   It identifies the source version by examining the version from the `app-service`.
+       *   This ensures that `app-service-stable` connects to `model-service-stable` and `app-service-canary` connects to `model-service-canary`.
 
 ## 7. Data Collection & Monitoring
 
@@ -109,44 +122,58 @@ These metrics monitor the health and performance of the application versions.
 
 ## 8. Decision Process
 
-The experiment will run for a defined period (e.g., 1-2 weeks, or until a statistically significant number of reviews are submitted for both `stable` and `canary` versions) to gather sufficient data. The Grafana dashboard displaying the "Total Correction Rate (Over Selected Time Range)" and key health metrics (latency) will be the primary tool for monitoring.
+### Experiment Duration and Completion Criteria
+The experiment will run until one of the following conditions is met:
+- A minimum of 200 reviews have been submitted through the canary version, providing sufficient statistical power for comparison
+- A maximum of 4 weeks have elapsed since the experiment start date, ensuring timely decision-making regardless of traffic volume
 
-The decision to fully roll out the confidence score feature, iterate on it, or roll it back will be based on the following:
+### Evaluation Framework and Success Criteria
+We will evaluate our primary hypothesis (H1) using specific quantitative thresholds:
 
-1.  **Primary Outcome (Supports H1 - Increased User Engagement & Corrections):**
-    *   A statistically significant **increase** in the overall `correction_rate` (calculated as `total_overrides / total_reviews_submitted` over the experiment period) for the `canary` version compared to the `stable` version, as observed in the Grafana "Total Correction Rate" panel.
-    *   No significant degradation in system health metrics for the `canary` version, particularly:
-        *   Average Prediction Latency
-        *   P95 Prediction Latency
-        *   (And implicitly, no major increase in application error rates, though not explicitly on this summary dashboard).
-    *   **Rationale for Success:** An increased correction rate, especially if the feature is well-received qualitatively, would suggest that providing confidence scores empowers users to provide more accurate feedback, potentially improving the quality of user-validated data or helping identify areas where the model is less certain.
-    *   **Action:** If this outcome is observed and deemed beneficial, proceed with a gradual rollout of the confidence score feature to all users.
+1. **Primary Metric - Correction Rate:**
+   - We will accept H1 if the correction rate in the canary version increases by at least 10% compared to the stable version
+   - This threshold represents a meaningful change in user behavior that justifies the implementation effort
+   - The calculation will compare (total overrides / total reviews) between versions over the full experiment period
 
-2.  **Neutral Outcome (Supports H0 - No Significant Impact):**
-    *   No statistically significant difference in the `correction_rate` between the `stable` and `canary` versions.
-    *   No adverse impact on system health metrics (latency, error rates).
-    *   **Action:** In this scenario, the team will discuss:
-        *   If the feature offers other qualitative benefits (e.g., perceived user transparency, trust) that might warrant a rollout despite no measurable change in correction behavior.
-        *   If the cost/complexity of maintaining the feature is minimal.
-        *   A decision may be made to roll out if benefits are perceived and risks are low, to iterate on the feature presentation if there's a belief it could be improved, or to remove the feature if no clear benefit is identified.
+2. **Guardrail Metrics - Performance Impact:**
+   - Average prediction latency must not increase by 5% or more in the canary version
+   - P95 prediction latency must not increase by 5% or more in the canary version
+   - These thresholds protect against user experience degradation due to performance issues
 
-3.  **Negative Outcome (Unexpected Result or System Issues):**
-    *   A statistically significant *decrease* in the `correction_rate` for the `canary` version (contrary to H1, but still a notable change that needs understanding – perhaps users are overly trusting high confidence scores even when incorrect, or confused).
-    *   Or, a significant and unacceptable increase in Average or P95 Prediction Latency for the `canary` version.
-    *   Or, other monitored system metrics (e.g., application error rates, though not on this specific summary dashboard) show a significant negative impact attributable to the `canary` version.
-    *   **Action:** Roll back the `canary` changes by shifting 100% of traffic back to the `stable` version. Investigate the root cause of the negative impact. Re-evaluate the feature's design, implementation, or the underlying hypothesis.
+### Decision Matrix and Outcomes
 
-**Timeline for Review (General):**
-*   **Initial 24-48 Hours:** Monitor for critical system failures in the `canary` (e.g., significantly higher latency, widespread errors if other monitoring is in place).
-*   **Regular Check-ins (e.g., Daily/Every Few Days):** Review the Grafana "Experiment Summary Stats" dashboard. Observe trends in `correction_rate` and latencies.
-*   **End of Experiment Period:** Conduct a final statistical analysis of the `correction_rate` (comparing the total overrides vs. total submissions for `stable` and `canary` over the full experiment duration). Make a decision based on the outcomes outlined above.
+1. **Full Rollout (Success Case):**
+   - **Criteria Met:** 
+     - Correction rate increases by 10% or more
+     - Both latency metrics remain within acceptable thresholds (<5% increase)
+   - **Interpretation:** The confidence score feature successfully encourages appropriate user corrections without compromising performance
+   - **Action:** Proceed with full rollout to all users and incorporate the feature into the stable version
+
+2. **Further Evaluation Required (Mixed Results):**
+   - **Criteria Met:** 
+     - Correction rate increases by 10% or more
+     - BUT one or both latency metrics exceed thresholds (≥5% increase)
+   - **Interpretation:** The feature shows promise but may need optimization
+   - **Action:** Conduct team review to determine if the benefits outweigh performance costs, or if optimization is needed before rollout
+
+3. **Rollback (Failure Case):**
+   - **Criteria Met:**
+     - Correction rate increases by less than 10% or decreases
+     - OR critical performance degradation observed beyond acceptable thresholds
+   - **Interpretation:** The feature does not provide sufficient benefit or causes unacceptable performance issues
+   - **Action:** Revert to stable version only.
+
+### Monitoring and Evaluation Schedule
+- **First 48 hours:** Daily monitoring of system stability and initial metrics
+- **Weekly reviews:** Review of metrics and trends
+- **Final analysis:** Comprehensive review of all metrics at experiment completion
 
 
 ## 9. Grafana Dashboard Visualization
 
 A Grafana dashboard will be central. This is the visualization of the dashboard:
 
-![Experiment Dashboard](experiment_dashboard.png)
+![Experiment Dashboard](images/experiment_dashboard.png)
 
 ---
 

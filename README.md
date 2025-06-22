@@ -70,7 +70,6 @@ minikube addons enable ingress
 ```bash
 istioctl install
 # go to the appropriate directory where istio is installed
-kubectl apply -f istio-1.26.0/samples/addons/prometheus.yaml
 kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
 kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
 ```
@@ -165,29 +164,21 @@ minikube stop
 
 ---
 
-### Istio Rate Limiting Guide
+### Istio Rate Limiting
 
-- Run the following commands:
+Rate limiting is already configured in the Helm chart. When you install the application using Helm, rate limiting will be automatically applied with the following settings:
 
-  ```bash
-  # Apply rate limit ConfigMap and EnvoyFilter
-  kubectl apply -f rate-limiting.yaml -n istio-system
+- Maximum 10 requests per minute per client IP address
+- Requests exceeding this limit will receive a 429 (Too Many Requests) response
 
-  # Deploy the rate limit service
-  kubectl apply -f path/to/istio/samples/ratelimit/rate-limit-service.yaml -n istio-system
-  ```
-- Test Rate Limiting:
+You can test the rate limiting by making multiple requests in quick succession:
 
-  Replace the `GATEWAY_PORT` value with your actual NodePort (found via `kubectl -n istio-system get svc istio-ingressgateway`).
-
-  ```bash
-  export GATEWAY_PORT=30530  # Replace with your actual port
-
-  for i in {1..20}; do
-    curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://192.168.49.2:$GATEWAY_PORT/
-  done
-  ```
-  If over 10 requests are made within one minute, subsequent ones should return a 429 Too Many Requests error.
+```bash
+# Replace with the correct IP or hostname for your environment
+for i in {1..20}; do
+  curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://app-frontend.k8s.local/
+done
+```
 
 ## Option 3: Provisioning VMs with Vagrant and Ansible
 
@@ -316,4 +307,4 @@ Note: The port number (1234) can be changed to any available port on your local 
   1. Go to **Dashboards** in the left sidebar
   2. Click **New** → **Import**
   3. Upload the dashboard JSON file or paste the JSON content
----                  
+---
