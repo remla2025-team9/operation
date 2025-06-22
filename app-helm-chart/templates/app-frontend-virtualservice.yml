@@ -15,43 +15,50 @@ spec:
       match:
         - headers:
             Cookie:
-              regex: ".*app-frontend-version={{ .Values.appFrontend.stable.versionLabel }}.*"
+              regex: ".*app-version={{ .Values.versions.stable.versionLabel }}.*"
       route:
         - destination:
             host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: {{ .Values.appFrontend.stable.versionLabel }}
+            subset: {{ .Values.versions.stable.versionLabel }}
+    
+    {{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
     - name: "route-if-canary-cookie"
       match:
         - headers:
             Cookie:
-              regex: ".*app-frontend-version={{ .Values.appFrontend.canary.versionLabel }}.*"
+              regex: ".*app-version={{ .Values.versions.canary.versionLabel }}.*"
       route:
         - destination:
             host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: {{ .Values.appFrontend.canary.versionLabel }}
+            subset: {{ .Values.versions.canary.versionLabel }}
+    {{- end }}
+    
     - name: "default-route-and-set-cookie"
       route:
         - destination:
             host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: {{ .Values.appFrontend.stable.versionLabel }}
-          weight: {{ .Values.appFrontend.stable.destinationWeight }}
+            subset: {{ .Values.versions.stable.versionLabel }}
+          weight: {{ if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}{{ .Values.versions.stable.destinationWeight }}{{ else }}100{{ end }}
           headers:
             response:
               add:
-                "Set-Cookie": "app-frontend-version={{ .Values.appFrontend.stable.versionLabel }}; Path=/; Max-Age=2592000"
+                "Set-Cookie": "app-version={{ .Values.versions.stable.versionLabel }}; Path=/; Max-Age=2592000"
+        
+        {{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
         - destination:
             host: {{ .Release.Name }}-app-frontend
             port:
               number: {{ .Values.appFrontend.service.port }}
-            subset: {{ .Values.appFrontend.canary.versionLabel }}
-          weight: {{ .Values.appFrontend.canary.destinationWeight }}
+            subset: {{ .Values.versions.canary.versionLabel }}
+          weight: {{ .Values.versions.canary.destinationWeight }}
           headers:
             response:
               add:
-                "Set-Cookie": "app-frontend-version={{ .Values.appFrontend.canary.versionLabel }}; Path=/; Max-Age=2592000"
+                "Set-Cookie": "app-version={{ .Values.versions.canary.versionLabel }}; Path=/; Max-Age=2592000"
+        {{- end }}

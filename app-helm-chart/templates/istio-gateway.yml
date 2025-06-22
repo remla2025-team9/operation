@@ -13,7 +13,4 @@ spec:
         protocol: HTTP
       hosts:
         - {{ .Values.appFrontend.ingress.host | quote }}
-        - {{ .Values.appService.stable.host | quote }}
-        {{- if .Values.appService.canary.enabled }}
-        - {{ .Values.appService.canary.host | quote }}
-        {{- end }}
+        - {{ .Values.appService.ingress.host | quote }}

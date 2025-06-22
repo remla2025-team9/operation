@@ -4,27 +4,35 @@ metadata:
   name: {{ .Release.Name }}-app-service-vs
 spec:
   hosts:
-    - {{ .Values.appService.stable.host | quote }}
-    {{- if .Values.appService.canary.enabled }}
-    - {{ .Values.appService.canary.host | quote }}
-    {{- end }}
+    - {{ .Values.appService.ingress.host | quote }}
   gateways:
     - {{ .Release.Name }}-my-istio-gateway
   http:
-    - match:
-        - authority:
-            exact: {{ .Values.appService.stable.host | quote }}
+    - name: "route-if-stable-header"
+      match:
+        - headers:
+            X-App-Version:
+              exact: {{ .Values.versions.stable.versionLabel }}
       route:
         - destination:
             host: {{ .Release.Name }}-app-service
-            subset: {{ .Values.appService.stable.versionLabel }}
+            subset: {{ .Values.versions.stable.versionLabel }}
     
-    {{- if .Values.appService.canary.enabled }}
-    - match:
-        - authority:
-            exact: {{ .Values.appService.canary.host | quote }}
+    {{- if and .Values.appService.canary.enabled .Values.versions.canary.enabled }}
+    - name: "route-if-canary-header"
+      match:
+        - headers:
+            X-App-Version:
+              exact: {{ .Values.versions.canary.versionLabel }}
       route:
         - destination:
             host: {{ .Release.Name }}-app-service
-            subset: {{ .Values.appService.canary.versionLabel }}
+            subset: {{ .Values.versions.canary.versionLabel }}
     {{- end }}
+    
+    # This route handles requests without a specific version header.
+    - name: "default-route"
+      route:
+        - destination:
+            host: {{ .Release.Name }}-app-service
+            subset: {{ .Values.versions.stable.versionLabel }}

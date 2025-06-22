@@ -5,10 +5,12 @@ metadata:
 spec:
   host: {{ .Release.Name }}-app-frontend
   subsets:
-    - name: {{ .Values.appFrontend.stable.versionLabel }}
+    - name: {{ .Values.versions.stable.versionLabel }}
       labels:
-        version: {{ .Values.appFrontend.stable.versionLabel }}
-    - name: {{ .Values.appFrontend.canary.versionLabel }}
+        version: {{ .Values.versions.stable.versionLabel }}
+    {{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
+    - name: {{ .Values.versions.canary.versionLabel }}
       labels:
-        version: {{ .Values.appFrontend.canary.versionLabel }}
+        version: {{ .Values.versions.canary.versionLabel }}
+    {{- end }}
 
