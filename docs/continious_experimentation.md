@@ -93,7 +93,7 @@ These metrics monitor the health and performance of the application versions.
 
 ## 6. Experiment Setup & Traffic Management
 
-*   **Canary Deployment:** The `canary` versions of `app-frontend`, `app-service`, and `model-service` will be deployed alongside their `stable` counterparts. Image tags for these canary deployments will be `:canary`, managed via our CI/CD pipeline (e.g., a manually triggered GitHub Action on a feature branch). Crucially, the `stable` and `canary` deployments for `app-service` will be configured with a distinct environment variable, `APP_VERSION_LABEL` (set to "stable" or "canary" respectively). This environment variable is used within the application to label the emitted metrics, allowing for clear differentiation of  metrics picked up by Prometheus.
+*   **Canary Deployment:** The `canary` versions of `app-frontend`, `app-service`, and `model-service` will be deployed alongside their `stable` counterparts. Image tags for these canary deployments will be `:canary`, managed via our "Canary Feature Deployment" CI/CD pipeline that can be manually triggered in GitHub Action on a feature branch. Crucially, the `stable` and `canary` deployments for `app-service` will be configured with a distinct environment variable, `APP_VERSION_LABEL` (set to "stable" or "canary" respectively). This environment variable is used within the application to label the emitted metrics, allowing for clear differentiation of  metrics picked up by Prometheus.
 
 *   **Traffic Splitting:** We will use Istio to manage traffic. Initially, a small percentage of user traffic (e.g., 10%) will be directed to the `canary` stack, while the remaining 90% will continue to use the `stable` stack. This will be configured using Istio `VirtualService` and `DestinationRule` resources for each of the three services (`app-frontend`, `app-service`, `model-service`) to ensure consistent routing (i.e., a user hitting `app-frontend-canary` will use `app-service-canary` and `model-service-canary`).
 
@@ -103,12 +103,14 @@ These metrics monitor the health and performance of the application versions.
        *   If a request has a cookie `{{ .Release.Name }}-app-version=stable`, it's routed to the `stable` `app-frontend` subset.
        *   If a request has a cookie `{{ .Release.Name }}-app-version=canary`, it's routed to the `canary` `app-frontend` subset.
        *   For new users without this cookie, the `VirtualService` routes them based on defined weights (e.g., 90% stable, 10% canary) and adds a `Set-Cookie` header to establish persistence.
+       *   **Testing Specific Versions:** To manually test a specific frontend version, set the cookie `app-version=stable` or `app-version=canary` in your browser (replace "my-app" with your actual release name).
 
     2. **Backend Routing (Header-based):**
        *   The `app-service` routing is based on an `X-App-Version` header rather than cookies.
        *   When the `app-frontend` makes requests to the `app-service`, it sets the `X-App-Version` header based on the cookie value it received.
        *   This header-based approach was necessary because browser requests don't automatically forward cookies across different domains/services.
        *   Direct API consumers (e.g., Postman) can achieve sticky sessions for the backend by consistently using the same `X-App-Version` header in their requests.
+       *   **Testing Specific Versions:** To target a specific app-service version directly, add the header `X-App-Version: stable` or `X-App-Version: canary` to your API requests.
 
     3. **Model Service Routing:**
        *   The `model-service` is internal and only accessible from within the cluster by the `app-service`.
@@ -128,7 +130,7 @@ The experiment will run until one of the following conditions is met:
 - A maximum of 4 weeks have elapsed since the experiment start date, ensuring timely decision-making regardless of traffic volume
 
 ### Evaluation Framework and Success Criteria
-We will evaluate our primary hypothesis (H1) using specific quantitative thresholds:
+We will evaluate our primary hypothesis (H1) using specific quantitative thresholds. These thresholds can all be obtained from the Grafana dashboard, described in section 9:
 
 1. **Primary Metric - Correction Rate:**
    - We will accept H1 if the correction rate in the canary version increases by at least 10% compared to the stable version
@@ -171,7 +173,7 @@ We will evaluate our primary hypothesis (H1) using specific quantitative thresho
 
 ## 9. Grafana Dashboard Visualization
 
-A Grafana dashboard will be central. This is the visualization of the dashboard:
+A Grafana dashboard will be central. The dashboard can be found in Grafana under the name "Experiment Dashboard". The corresponding json file can be found in the helm chart with path "grafana-dashboards/experiment-dashboard.json". This is a visualization of the dashboard:
 
 ![Experiment Dashboard](images/experiment_dashboard.png)
 

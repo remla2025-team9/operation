@@ -123,7 +123,6 @@ c. Add hostnames to your local hosts file:
 # Replace hostnames if you changed them in values.yaml
 sudo sh -c "echo '$INGRESS_BIND_IP app-frontend.k8s.local' >> /etc/hosts"
 sudo sh -c "echo '$INGRESS_BIND_IP app-service.k8s.local' >> /etc/hosts"
-sudo sh -c "echo '$INGRESS_BIND_IP canary.app-service.k8s.local' >> /etc/hosts"
 
 # Check if the hostnames are correctly added to the /etc/hosts file
 cat /etc/hosts

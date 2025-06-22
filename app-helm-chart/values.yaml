@@ -3,13 +3,13 @@ versions:
   stable:
     versionLabel: "stable"
     # The destinationWeight is used to control the traffic split between stable and canary versions.
-    destinationWeight: 90
+    destinationWeight: 10
   canary:
     # This setting enables canary deployments for every service that supports it.
     enabled: true
     versionLabel: "canary"
     # The destinationWeight is used to control the traffic split between stable and canary versions.
-    destinationWeight: 10
+    destinationWeight: 90
 
 # model-service settings
 modelService:
