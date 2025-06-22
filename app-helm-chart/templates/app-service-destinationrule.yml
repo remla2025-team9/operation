@@ -4,10 +4,6 @@ metadata:
   name: {{ .Release.Name }}-app-service-dr
 spec:
   host: {{ .Release.Name }}-app-service
-  trafficPolicy:
-    loadBalancer:
-      consistentHash:
-        httpHeaderName: x-user
   subsets:
     - name: {{ .Values.appService.stable.versionLabel }}
       labels:
