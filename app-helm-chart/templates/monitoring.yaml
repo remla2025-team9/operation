@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: app-service-servicemonitor
+  name: {{ .Release.Name }}-app-service-servicemonitor
   namespace: {{ .Release.Namespace }}
   labels:
     app: app-service
@@ -21,7 +21,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: reviews-submitted-alert
+  name: {{ .Release.Name }}-reviews-submitted-alert
   namespace: {{ .Release.Namespace }}
   labels:
     app: app-service
@@ -42,8 +42,11 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: alertmanager-secret
+  name: {{ .Release.Name }}-alertmanager-secret
   namespace: {{ .Release.Namespace }}
+  labels:
+    release: {{ .Release.Name }}
+    app: app-service
 type: Opaque
 stringData:
   smtp_auth_username: {{ .Values.alertCreds.username | quote }}
@@ -52,7 +55,7 @@ stringData:
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
-  name: reviews-submitted-alertmanager
+  name: {{ .Release.name }}-reviews-submitted-alertmanager
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Release.Name }}
@@ -67,7 +70,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1alpha1
 kind: AlertmanagerConfig
 metadata:
-  name: email-config
+  name: {{ .Release.Name }}-email-config
   namespace: {{ .Release.Namespace }}
   labels:
     alertmanagerConfig: main
