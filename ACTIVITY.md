@@ -110,3 +110,71 @@
 - Created PR: https://github.com/remla2025-team9/operation/pull/40 (related to A5)
 - Approved PR: https://github.com/remla2025-team9/operation/pull/34 (related to A5)
 
+
+# Week 7
+
+### Timo
+- Created PR: https://github.com/remla2025-team9/app-frontend/pull/20 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
+
+### Raoul
+- Created PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
+- Approved PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
+
+### Artin
+- Created PR: https://github.com/remla2025-team9/lib-version/pull/4 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
+
+### Shuang
+- Created PR: https://github.com/remla2025-team9/lib-ml/pull/9 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/app-frontend/pull/20 (related to A1)
+
+### Lucian
+- Created PR: https://github.com/remla2025-team9/operation/pull/49 (related to A2)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/47 (related to A2)
+
+
+# Week 8
+
+### Timo
+- Created PR: https://github.com/remla2025-team9/app-service/pull/18 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/52 (related to A3)
+
+### Raoul
+- Created PR: https://github.com/remla2025-team9/operation/pull/54 (related to A3)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/52 (related to A3)
+
+### Artin
+- Created PR: https://github.com/remla2025-team9/model-training/pull/16 (related to A4)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/49 (related to A2)
+
+### Shuang
+- Created PR: https://github.com/remla2025-team9/operation/pull/52 (related to A3)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/49 (related to A2)
+
+### Lucian
+- Created PR: https://github.com/remla2025-team9/operation/pull/55 (related to A3)
+- Approved PR: https://github.com/remla2025-team9/operation/pull/54 (related to A3)
+
+
+# Week 9
+
+### Timo
+- Created PR: https://github.com/remla2025-team9/model-service/pull/14 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
+
+### Raoul
+- Created PR: -
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
+
+### Artin
+- Created PR:https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
+- Approved PR: https://github.com/remla2025-team9/model-service/pull/14 (related to A1)
+
+### Shuang
+- Created PR: https://github.com/remla2025-team9/model-training/pull/18 (related to A4)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
+
+### Lucian
+- Created PR: 
+- Approved PR: 
