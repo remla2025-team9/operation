@@ -58,6 +58,28 @@ echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
 - kubectl
 - istioctl
 
+### Alert mail setup
+To set up email alerts, you need to create an app password for your Google account. This is necessary for sending alerts via email using the SMTP server.
+
+You can create an app password by following these steps:
+1. Go to your Google Account settings.
+2. Navigate to the "Security" section.
+3. Enable 2-Step Verification if you haven't already.
+4. Under "Signing in to Google," find the "App passwords" option. (or navigate directly to https://myaccount.google.com/apppasswords)
+5. Create a new app password for the application you want to use (e.g., "Alert Mail").
+6. Modify the `values.yaml` file in the Helm chart to include your email and app password:
+
+```yaml
+alertCreds:
+  username: <your-gmail-address>
+  password: <your-app-password>
+```
+The mail alert will be sent to the email address `remla2025team9.alerts@gmail.com`. The credentials to login to this email are:
+```text
+Username: remla2025team9.alerts@gmail.com
+Password: team9-alerts
+```
+
 ### Setup steps
 
 1. Start Minikube with appropriate resources and enable ingress:

@@ -120,6 +120,11 @@ grafana:
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
+
+alertCreds:
+  username: "" # Will be set during helm installation
+  password: ""
+
 kube-prometheus-stack:
   prometheusOperator:
     admissionWebhooks:
