@@ -35,7 +35,12 @@ This is the simplest way to get all services running on your local machine.
 
 **Steps:**
 
-1.  **Configure Environment:**
+1.  **Navigate to the Docker Compose Directory:**
+    ```bash
+    cd docker-compose
+    ```
+
+2.  **Configure Environment:**
     Copy the example environment files. The default values are suitable for most local setups.
     ```bash
     cp app-service.env.example app-service.env
@@ -43,17 +48,17 @@ This is the simplest way to get all services running on your local machine.
     cp model-service.env.example model-service.env
     ```
 
-2.  **Start Services:**
+3.  **Start Services:**
     This command will download the necessary images and start all services in the background.
     ```bash
     docker compose up -d
     ```
 
-3.  **Access Services:**
+4.  **Access Services:**
     *   Frontend: `http://localhost:8080`
     *   Backend API: `http://localhost:5001`
 
-4.  **Stop Services:**
+5.  **Stop Services:**
     ```bash
     docker compose down
     ```
