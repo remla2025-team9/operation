@@ -228,7 +228,7 @@ To access the application from your browser, you must map the service hostnames 
         ```bash
         # Replace {{ INGRESS_IP }} with 127.0.0.1 for Minikube or 192.168.56.91 for Vagrant
         # This command adds all required hostnames for the default setup
-        sudo sh -c "echo '{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local' >> /etc/hosts"
+        sudo sh -c "echo '{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local' >> /etc/hosts"
         
         # Verify the entry was added
         cat /etc/hosts
@@ -328,6 +328,10 @@ Follow the steps corresponding to the method you used to run the application.
     helm uninstall my-app
 
     # Stop the Kubernetes cluster itself
-    minikube stop      # If you used Minikube
-    vagrant destroy -f # If you used Vagrant
+    # If you used Minikube
+    minikube stop
+
+    # If you used vagrant
+    # Navigate to the '/vagrant' folder
+    vagrant destroy -f
     ```
