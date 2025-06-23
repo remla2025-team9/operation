@@ -120,9 +120,10 @@ grafana:
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
+# Alert credential settings. Should be configured to make sending email alerts possible.
 alertCreds:
-  username: "remla2025team9.alerts@gmail.com"
-  password: "team9-alerts"
+  username: "" # Username for alerting credentials, if required (see README for details)
+  password: "" # Password for alerting credentials, if required (see README for details)
 
 kube-prometheus-stack:
   prometheusOperator:

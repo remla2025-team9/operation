@@ -191,6 +191,30 @@ Proceed to **Step 2: Deploy the Application with Helm**.
 
 Before proceeding, ensure kubectl is properly configured to communicate with your cluster. Run `kubectl get nodes` to verify connectivity. You should see your cluster's nodes listed with a status of "Ready". If you encounter errors, double-check that your kubeconfig is correctly set up as described in the previous step. For Minikube, kubectl configuration should happen automatically, while for Vagrant, you'll need to set the KUBECONFIG environment variable or merge the provided config file.
 
+The Helm chart supports email alerting, but requires configuration to work. There is no default setup, you must follow these steps to enable alert emails:
+
+1. Create an app password for your Google account:
+   - Go to your Google Account settings
+   - Navigate to the "Security" section
+   - Enable 2-Step Verification if you haven't already
+   - Under "Signing in to Google," find the "App passwords" option (or navigate directly to https://myaccount.google.com/apppasswords)
+   - Create a new app password for the application (e.g., "Alert Mail")
+
+2. Modify the `values.yaml` file in the Helm chart to include your email and app password:
+   ```yaml
+   alertCreds:
+     username: <your-gmail-address>
+     password: <your-app-password>
+   ```
+
+> **Note:** You can always change the email alert settings later using the same step-by-step plan. Make sure to update the helm chart after making these modifications.
+
+The mail alerts will be sent from the email address `remla2025team9.alerts@gmail.com`. The credentials to login to this email are:
+```text
+Username: remla2025team9.alerts@gmail.com
+Password: team9-alerts
+```
+
 Once your cluster is running, deploy the application using the provided Helm chart.
 
 1.  **Navigate to the Helm Chart Directory:**
@@ -262,33 +286,6 @@ You can change default settings like hostnames, replica counts, or container ver
 
 > **Important:** If you change the hostnames of app-frontend or app-service in `values.yaml`, remember to update the corresponding entries in your local `hosts` file as explained in Step 3 of the Kubernetes Deployment instructions. Otherwise, your browser won't be able to resolve the custom hostnames to your cluster's IP address. Similarly, if you modify the service ports in `values.yaml`, you'll need to include those ports in your URLs when accessing the services (e.g., `http://app-frontend.k8s.local:8080` instead of the default `http://app-frontend.k8s.local`).
 
-
-### Monitoring Alert Mail Setup
-
-The Helm chart is pre-configured with email alerting. By default, alert emails will be sent to and received by the account `remla2025team9.alerts@gmail.com`. The credentials to log in to this account are:
-
-```text
-Username: remla2025team9.alerts@gmail.com
-Password: team9-alerts
-```
-
-To customize alert emails to use your own Gmail account instead of the default, you need to create an app password for your Google account. This is necessary for sending alerts via email using the SMTP server.
-
-You can create an app password by following these steps:
-1. Go to your Google Account settings.
-2. Navigate to the "Security" section.
-3. Enable 2-Step Verification if you haven't already.
-4. Under "Signing in to Google," find the "App passwords" option. (or navigate directly to https://myaccount.google.com/apppasswords)
-5. Create a new app password for the application you want to use (e.g., "Alert Mail").
-6. Modify the `values.yaml` file in the Helm chart to include your email and app password:
-
-```yaml
-alertCreds:
-  username: <your-gmail-address>
-  password: <your-app-password>
-```
-
-To finalize these changes, update the helm chart by running `helm upgrade my-app .` in the app-helm-chart folder
 
 
 ### Viewing the Grafana Dashboard
