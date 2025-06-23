@@ -160,8 +160,8 @@
 # Week 9
 
 ### Timo
-- Created PR:
-- Approved PR: 
+- Created PR: https://github.com/remla2025-team9/model-service/pull/14 (related to A1)
+- Approved PR: https://github.com/remla2025-team9/model-training/pull/21 (related to A4)
 
 ### Raoul
 - Created PR: 
