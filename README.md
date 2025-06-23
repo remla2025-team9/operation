@@ -1,65 +1,278 @@
-# Operation
+# REMLA 2025 Team 9 - Operations
 
-This repository helps connect and run the services developed by REMLA 2025 Team 9. The application can be run either using Docker Compose locally or deployed to a Kubernetes cluster using Minikube and Helm.
+This repository contains the necessary configuration to run and operate the services developed by REMLA 2025 Team 9. You can run the entire application stack locally using Docker Compose or deploy it to a Kubernetes cluster.
 
-## Repositories
+## Project Repositories
 
-Each repository has a `README.md` file with information about running. Below is a summary of each repository:
+You can click on the repository name to navigate to the corresponding GitHub page.
 
-| Repository                                                          | Description                                                                                                                                                                                                                        |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [model-training](https://github.com/remla2025-team9/model-training) | Code for training ML models using datasets, including preprocessing, training, evaluation, and model saving.                                                                                                                       |
-| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API. Built with Flask, containerized with Docker, and supports integration with `app-service`.                                                                               |
-| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Contains shared logic for data preprocessing and any ML-related utilities. Used by both training and inference components.                                                                                                         |
-| [app-service](https://github.com/remla2025-team9/app-service)       | Flask-based web service providing the main API interface. Includes `/healthcheck` and `/version`  routes and is configured to run in a Docker container. CI/CD is enabled for automatic tagging, versioning, and image publishing. |
-| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application showing the status of the system, version info, or predictions. Communicates with `app-service`.                                                                                                              |
-| [lib-version](https://github.com/remla2025-team9/lib-version)       | Lightweight Python library with a `VersionUtil` class to retrieve the current version. Version is maintained in `__version__.py` and updated automatically using GitHub workflows.                                                 |
-| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all project services using `docker-compose`. Includes `README.md`, `docker-compose.yml`, and activity log for all assignments                                                                                         |
+| Repository                                                          | Description                                                                                           |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [model-training](https://github.com/remla2025-team9/model-training) | Trains ML models, including preprocessing, training, evaluation, and model saving.                    |
+| [model-service](https://github.com/remla2025-team9/model-service)   | Serves predictions from a trained ML model via a REST API.                                            |
+| [lib-ml](https://github.com/remla2025-team9/lib-ml)                 | Shared logic for data preprocessing and other ML-related utilities.                                   |
+| [app-service](https://github.com/remla2025-team9/app-service)       | The main backend API service, built with Flask.                                                       |
+| [app-frontend](https://github.com/remla2025-team9/app-service)      | Frontend application that communicates with `app-service` to display system status and predictions.   |
+| [lib-version](https://github.com/remla2025-team9/lib-version)       | A lightweight library for managing and retrieving the application version.                            |
+| [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all services using Docker Compose, Helm for Kubernetes, and Vagrant for VM provisioning. |
 
-## Option 1: Running with Docker Compose
 
-Make sure Docker and Docker Compose are installed. Then:
 
-Configure the env files for each service:
-* app-service.env
-* app-frontend.env
-* model-service.env
+## Project Structure
 
-To use the default configurations, copy the example files:
+- **`docker-compose/`** - Contains Docker Compose files and environment configurations for local development
+- **`app-helm-chart/`** - Kubernetes deployment files using Helm
+- **`vagrant/`** - Scripts to provision a multi-node Kubernetes cluster using VMs through Vagrant and Ansible
+- **`docs/`** - Documentation files
 
+## Getting Started
+
+You have two main options for running the application:
+
+1.  **Docker Compose:** For a quick, lightweight local setup.
+2.  **Kubernetes:** For a full-fledged deployment that mirrors a production environment.
+
+## Method 1: Local Development with Docker Compose
+
+This is the simplest way to get all services running on your local machine.
+
+**Prerequisites:**
+*   Docker
+*   Docker Compose
+
+**Steps:**
+
+1.  **Navigate to the Docker Compose Directory:**
+    ```bash
+    cd docker-compose
+    ```
+
+2.  **Configure Environment:**
+    Copy the template environment files. The default values are suitable for most local setups.
+    ```bash
+    cp env-files/app-service.env.template env-files/app-service.env
+    cp env-files/app-frontend.env.template env-files/app-frontend.env
+    cp env-files/model-service.env.template env-files/model-service.env
+    ```
+
+3.  **Start Services:**
+    This command will download the necessary images and start all services in the background.
+    ```bash
+    docker compose up -d
+    ```
+
+4.  **Access Services:**
+    *   App-frontend: `http://localhost:3000`
+    *   App-backend: `http://localhost:5000`
+
+5.  **Stop Services:**
+    ```bash
+    docker compose down
+    ```
+
+> **Note:** If you are using images from GitHub Container Registry (GHCR) and encounter permission errors, log in to Docker first:
+> `echo $GH_TOKEN | docker login ghcr.io -u YOUR_USERNAME --password-stdin`
+
+---
+
+## Method 2: Kubernetes Deployment
+
+This method deploys the application to a Kubernetes cluster using Helm. You can set up the cluster using either Minikube (local) or Vagrant (virtual machines).
+
+---
+
+### **Step 1: Set Up Your Kubernetes Environment**
+
+Choose one of the following options to prepare your cluster, either Minikube or Vagrant (click on the prefered option).
+
+---
+
+### Option A: Using Minikube
+
+---
+
+**Prerequisites:**
+*   Minikube
+*   kubectl
+*   Helm
+*   istioctl
+
+**Instructions:**
+
+1.  **Start Minikube:**
+    Start a Minikube instance with sufficient resources and enable the `ingress` addon.
+    ```bash
+    minikube start --cpus 6 --memory 6144 --driver=docker
+    minikube addons enable ingress
+    ```
+
+2.  **Install Istio:**
+    Install Istio and its monitoring addons (Jaeger for tracing, Kiali for service mesh visualization).
+    ```bash
+    # Install the Istio control plane
+    istioctl install
+
+    # Apply addons (ensure the path to your Istio installation is correct)
+    kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
+    kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
+    ```
+
+3.  **Enable Istio Sidecar Injection:**
+    Label the `default` namespace to instruct Istio to automatically inject proxy sidecars into your application pods.
+    ```bash
+    kubectl label namespace default istio-injection=enabled
+    ```
+Your Minikube cluster is now prepared. Proceed to **Step 2: Deploy the Application with Helm**.
+
+---
+
+### Option B: Using Vagrant and Ansible
+
+----
+
+**Prerequisites:**
+*   Vagrant
+*   Ansible
+*   VirtualBox
+
+**1. Configure VM Resources (Optional):**
+The following environment variables can be used to customize the VM configurations.
+
+| Variable                   | Description                      | Default |
+| -------------------------- | -------------------------------- | ------- |
+| `WORKER_COUNT_ENV`         | Number of worker nodes to create | 2       |
+| `WORKER_CPU_COUNT_ENV`     | Number of CPUs for each worker   | 2       |
+| `WORKER_MEMORY_ENV`        | Memory (MB) for each worker      | 6144    |
+| `CONTROLLER_CPU_COUNT_ENV` | Number of CPUs for controller    | 1       |
+| `CONTROLLER_MEMORY_ENV`    | Memory (MB) for controller       | 4096    |
+
+To set these variables, export them in your terminal before starting vagrant:
+
+**Linux/macOS:**
 ```bash
-cp app-service.env.example app-service.env
-cp app-frontend.env.example app-frontend.env
-cp model-service.env.example model-service.env
+# This is an example configuration for the variables
+export WORKER_COUNT_ENV=1
+export WORKER_MEMORY_ENV=8192
 ```
 
-Start the services:
-```bash
-docker compose up -d
-```
-
-To stop the services:
+**2. Provision VMs and Cluster:**
+These commands will create the VMs, install dependencies, and set up a Kubernetes cluster using Ansible:
 
 ```bash
-docker compose down
+# Navigate to the Vagrant directory containing the Vagrantfile
+cd vagrant/
+
+# Copy your SSH public key to be authorized on the VMs
+# This allows passwordless SSH access to the provisioned machines
+# If you don't have an SSH key yet, create one with: ssh-keygen -t rsa -b 4096
+cp ~/.ssh/id_rsa.pub ssh/<your_username>.pub
+
+# Start and provision the VMs according to the Vagrantfile configuration
+# Note: The higher the CPU counts and memory were set, the faster this command executes
+vagrant up
+
+# Run the finalization playbook to complete the Kubernetes setup
+ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
 ```
 
-If you're using GitHub Container Registry (GHCR) images and encounter permission errors, log in first:
+Your cluster is now running. A `kubeconfig` file to access it is located at `vagrant/config/.kubeconfig`. You can use it by setting the `KUBECONFIG` environment variable to this file or simply use the following command.
 
 ```bash
-echo $GH_TOKEN | docker login ghcr.io -u USERNAME --password-stdin
+kubectl --kubeconfig config/.kubeconfig ...
 ```
 
-## Option 2: Running with Minikube
+Proceed to **Step 2: Deploy the Application with Helm**.
 
-### Prerequisites
-- Minikube
-- Helm
-- kubectl
-- istioctl
+</details>
 
-### Alert mail setup
-To set up email alerts, you need to create an app password for your Google account. This is necessary for sending alerts via email using the SMTP server.
+---
+
+### **Step 2: Deploy the Application with Helm**
+
+Before proceeding, ensure kubectl is properly configured to communicate with your cluster. Run `kubectl get nodes` to verify connectivity. You should see your cluster's nodes listed with a status of "Ready". If you encounter errors, double-check that your kubeconfig is correctly set up as described in the previous step. For Minikube, kubectl configuration should happen automatically, while for Vagrant, you'll need to set the KUBECONFIG environment variable or merge the provided config file.
+
+Once your cluster is running, deploy the application using the provided Helm chart.
+
+1.  **Navigate to the Helm Chart Directory:**
+    ```bash
+    cd app-helm-chart
+    ```
+
+2.  **Update Helm Dependencies:**
+    This downloads any chart dependencies listed in `Chart.yaml`.
+    ```bash
+    helm dependency update
+    ```
+
+3.  **Install the Helm Chart:**
+    This command deploys all project services, ingresses, and configurations to your cluster.
+    ```bash
+    # You can change 'my-app' to any release name you prefer
+    helm install my-app .
+    ```
+
+---
+
+### **Step 3: Access the Application Locally**
+
+To access the application from your browser, you must map the service hostnames to the cluster's ingress IP address on your local machine.
+
+1.  **Find and Expose the Ingress IP Address:**
+    *   **For Minikube:** You must create a tunnel from your local machine to the cluster's ingress controller. **Open a new, dedicated terminal** and run the following command. It will run continuously.
+        ```bash
+        # We bind to 127.0.0.1 for consistency
+        minikube tunnel --bind-address 127.0.0.1
+        ```
+        The Ingress IP for your `hosts` file will be `127.0.0.1`.
+
+    *   **For Vagrant:** The Ingress IP is static and pre-configured in the environment.
+        The Ingress IP is `192.168.56.91`.
+
+2.  **Update Your Local `hosts` File:**
+    Add an entry to your local `hosts` file to resolve the application domains to the Ingress IP.
+
+    *   **Linux/macOS** (`/etc/hosts`):
+        ```bash
+        # Replace {{ INGRESS_IP }} with 127.0.0.1 for Minikube or 192.168.56.91 for Vagrant
+        # This command adds all required hostnames for the default setup
+        sudo sh -c "echo '{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local' >> /etc/hosts"
+        
+        # Verify the entry was added
+        cat /etc/hosts
+        ```
+
+    *   **Windows** (Run PowerShell as Administrator):
+        ```powershell
+        # Replace {{ INGRESS_IP }} with 127.0.0.1 for Minikube or 192.168.56.91 for Vagrant
+        Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local"
+        ```
+
+3.  **Access the Application in Your Browser:**
+    You can now navigate to the services:
+    *   **App-frontend:** `http://app-frontend.k8s.local`
+    *   **App-backend:** `http://app-service.k8s.local`
+
+
+## Interacting with Your Kubernetes Deployment
+
+Your Helm deployment is pre-configured with powerful features for monitoring and management.
+
+### Customizing the Deployment
+You can change default settings like hostnames, replica counts, or container versions by editing the `app-helm-chart/values.yaml` file *before* running `helm install`. If you've already installed the chart, you can apply changes with `helm upgrade my-app .` in the app-helm-chart folder.
+
+> **Important:** If you change the hostnames of app-frontend or app-service in `values.yaml`, remember to update the corresponding entries in your local `hosts` file as explained in Step 3 of the Kubernetes Deployment instructions. Otherwise, your browser won't be able to resolve the custom hostnames to your cluster's IP address. Similarly, if you modify the service ports in `values.yaml`, you'll need to include those ports in your URLs when accessing the services (e.g., `http://app-frontend.k8s.local:8080` instead of the default `http://app-frontend.k8s.local`).
+
+
+### Monitoring Alert Mail Setup
+
+The Helm chart is pre-configured with email alerting. By default, alert emails will be sent to and received by the account `remla2025team9.alerts@gmail.com`. The credentials to log in to this account are:
+
+```text
+Username: remla2025team9.alerts@gmail.com
+Password: team9-alerts
+```
+
+To customize alert emails to use your own Gmail account instead of the default, you need to create an app password for your Google account. This is necessary for sending alerts via email using the SMTP server.
 
 You can create an app password by following these steps:
 1. Go to your Google Account settings.
@@ -74,258 +287,87 @@ alertCreds:
   username: <your-gmail-address>
   password: <your-app-password>
 ```
-The mail alert will be sent to the email address `remla2025team9.alerts@gmail.com`. The credentials to login to this email are:
-```text
-Username: remla2025team9.alerts@gmail.com
-Password: team9-alerts
-```
 
-### Setup steps
+To finalize these changes, update the helm chart by running `helm upgrade my-app .` in the app-helm-chart folder
 
-1. Start Minikube with appropriate resources and enable ingress:
+
+### Viewing the Grafana Dashboard
+Grafana is installed for monitoring application metrics.
+
+1.  **Access the Grafana UI:**
+    Use `kubectl port-forward` to access the Grafana service from your local machine.
+    ```bash
+    # This forwards the service's port 80 to your local port 1234
+    kubectl port-forward svc/my-app-grafana 1234:80
+    ```
+    Navigate to `http://localhost:1234` in your browser.
+
+2.  **Log In:**
+    *   **Username:** `admin`
+    *   **Password:** `prom-operator`
+
+3.  **Available Dashboards:**
+    The Helm chart includes two custom dashboards pre-configured in Grafana:
+    *   **Application Dashboard:** Provides overall system metrics obtained from Prometheus.
+    *   **Experiment Dashboard:** Specifically designed for the canary experiment, showing key metrics for comparing stable and canary versions.
+
+    These dashboards can be accessed from the Grafana dashboard page after login.
+
+### Testing Istio Rate Limiting
+The deployment includes a rate limit of 10 requests per minute per IP. You can test this with `curl`.
 ```bash
-minikube start --cpus 6 --memory 6144 --driver=docker
-minikube addons enable ingress
-```
-
-2. Install istio and the required addons:
-```bash
-istioctl install
-# go to the appropriate directory where istio is installed
-kubectl apply -f istio-1.26.0/samples/addons/jaeger.yaml
-kubectl apply -f istio-1.26.0/samples/addons/kiali.yaml
-```
-3. Enable istio sidecar injection for the namespace:
-```bash
-kubectl label namespace default istio-injection=enabled
-```
-5. Navigate to the Helm chart directory:
-```bash
-cd app-helm-chart
-```
-
-6. Install the application:
-```bash
-# Update dependencies first
-helm dependency update
-# Install the chart (optionally modify values.yaml first)
-helm install my-app .
-```
-
-7. Configure Local Access
-
-a. Check your service configuration in `values.yaml`:
-```yaml
-appFrontend:
-  ingress:
-    host: "app-frontend.k8s.local"  # Default frontend hostname
-  service:
-    port: 80              # Default frontend port
-
-appService:
-  stable:
-    host: "app-service.k8s.local"  # Default backend hostname
-  canary:
-    host: "canary.app-service.k8s.local" # Default canary backend hostname
-  service:
-    port: 80              # Default backend port
-```
-
-b. Start Minikube tunnel with a fixed IP:
-```bash
-# Use any IP address you prefer, default is 127.0.0.1
-export INGRESS_BIND_IP=127.0.0.1
-minikube tunnel --bind-address $INGRESS_BIND_IP
-```
-
-c. Add hostnames to your local hosts file:
-
-**Linux/macOS**:
-```bash
-# Replace hostnames if you changed them in values.yaml
-sudo sh -c "echo '$INGRESS_BIND_IP app-frontend.k8s.local' >> /etc/hosts"
-sudo sh -c "echo '$INGRESS_BIND_IP app-service.k8s.local' >> /etc/hosts"
-
-# Check if the hostnames are correctly added to the /etc/hosts file
-cat /etc/hosts
-```
-
-**Windows** (Run PowerShell as Administrator):
-```powershell
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "$INGRESS_BIND_IP app-frontend.k8s.local"
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "$INGRESS_BIND_IP app-service.k8s.local"
-```
-
-d. Access your services:
-- Frontend: `http://app-frontend.k8s.local:<frontend_port>`
-  - Default: http://app-frontend.k8s.local
-  - Custom: Use the port specified in `appFrontend.service.port`
-
-- Backend API: `http://app-service.k8s.local:<backend_port>`
-  - Default: http://app-service.k8s.local
-  - Custom: Use the port specified in `appService.service.port`
-
-Note: If you modify the default ports in `values.yaml`, you'll need to include them in the URL:
-```yaml
-# Example custom port configuration
-appFrontend:
-  service:
-    port: 8080  # Access via http://app-frontend.k8s.local:8080
-```
-
-
-### Clean up minikube:
-```bash
-# Uninstall the application
-helm uninstall my-app
-
-# Stop minikube
-minikube stop
-```
-
----
-
-### Istio Rate Limiting
-
-Rate limiting is already configured in the Helm chart. When you install the application using Helm, rate limiting will be automatically applied with the following settings:
-
-- Maximum 10 requests per minute per client IP address
-- Requests exceeding this limit will receive a 429 (Too Many Requests) response
-
-You can test the rate limiting by making multiple requests in quick succession:
-
-```bash
-# Replace with the correct IP or hostname for your environment
+# This loop sends 20 requests to the frontend
 for i in {1..20}; do
-  curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://app-frontend.k8s.local/
+  curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/
 done
 ```
-
-## Option 3: Provisioning VMs with Vagrant and Ansible
-
-### Prerequisites
-- Vagrant
-- Ansible
-- Helm
-- kubectl
-- VirtualBox
+You will see several `200` (OK) responses, followed by `429` (Too Many Requests).
 
 
-### Environment variables
+### Canary Deployment & Experimentation
+The Helm chart includes a complete setup for A/B testing with canary deployments:
 
-The following environment variables can be used to customize the VM configurations:
+- A **stable** version running the current production code
+- A **canary** version (10% of traffic) running experimental features
+- Consistent user experiences through sticky sessions
+- Dedicated metrics collection for experiment analysis
 
-| Variable                 | Description                      | Default |
-| ------------------------ | -------------------------------- | ------- |
-| WORKER_COUNT_ENV         | Number of worker nodes to create | 2       |
-| WORKER_CPU_COUNT_ENV     | Number of CPUs for each worker   | 2       |
-| WORKER_MEMORY_ENV        | Memory (MB) for each worker      | 6144    |
-| CONTROLLER_CPU_COUNT_ENV | Number of CPUs for controller    | 1       |
-| CONTROLLER_MEMORY_ENV    | Memory (MB) for controller       | 4096    |
+The canary deployment is part of a continuous experimentation framework measuring how displaying model confidence scores affects user behavior. Users assigned to the canary version will see confidence scores alongside sentiment predictions, while stable users see the traditional interface.
 
-To set all environment variables locally before starting (all values can be changed to match your needs):
+#### Testing Specific Versions
 
-```bash
-export WORKER_COUNT_ENV=1
-export WORKER_CPU_COUNT_ENV=1
-export WORKER_MEMORY_ENV=1024
-export CONTROLLER_CPU_COUNT_ENV=2
-export CONTROLLER_MEMORY_ENV=2048
-```
+You can manually test specific versions of each service:
 
-### Base configuration
+1. **Testing app-frontend Versions:**
+   - To access the stable frontend: Set cookie `app-version=stable` in your browser for the specific app-frontend domain 
+   - To access the canary frontend: Set cookie `app-version=canary` in your browser for the specific app-frontend domain
+   - For simplicity, you can access the frontend to automatically let it set a cookie in your browser. Afterwards you can set this cookie to the desired version.
 
-- All VMs use the `bento/ubuntu-24.04` box.
-- VMs are assigned static IPs in the `192.168.56.*` range:
-  - Controller node (`ctrl`): `192.168.56.100`
-  - Worker nodes: `192.168.56.101`, `192.168.56.102`, ...
+2. **Testing app-service API Versions Directly:**
+   - To access the stable API: Add header `X-App-Version: stable` to your API requests
+   - To access the canary API: Add header `X-App-Version: canary` to your API requests
 
-### Ansible provisioning
+For full details about the experimental setup, metrics, and decision criteria, see the [Continuous Experimentation documentation](docs/continious_experimentation.md).
 
-Each VM is further configured using Ansible playbooks:
 
-- **Controller (`ctrl`)** runs:
-  - `ansible/general.yaml`
-  - `ansible/ctrl.yaml`
-- **Worker nodes (`node-X`)** run:
-  - `ansible/general.yaml`
-  - `ansible/node.yaml`
+### Cleanup
 
-To spin up the VMs, make sure to be in the '/vagrant' directory
+Follow the steps corresponding to the method you used to run the application.
 
-### Provisioning the Kubernetes cluster and spinning up VMs
+*   **Docker Compose:**
+    ```bash
+    docker compose down
+    ```
+*   **Kubernetes (Minikube/Vagrant):**
+    ```bash
+    # Uninstall the Helm release from your cluster
+    helm uninstall my-app
 
-First, copy your SSH public key into the template files:
+    # Stop the Kubernetes cluster itself
+    # If you used Minikube
+    minikube stop
 
-```bash
-cp ~/.ssh/id_rsa.pub /ssh/<your_username>.pub
-```
-
-Then, run the following command to start the VMs and provision them with Ansible:
-
-```bash
-vagrant up
-```
-
-After the Kubernetes cluster is up, the installation can be finalized by running the following command in the `vagrant/` directory:
-
-```bash
-ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
-```
-
-Afterwards, you can find the kubernetes configuration file in `config/.kubeconfig`. You can use this file to connect to the Kubernetes cluster from your local machine. Make sure to set the `KUBECONFIG` environment variable to point to this file:
-
-```bash
-kubectl --kubeconfig config/.kubeconfig ...
-```
-
-### Install Helm chart
-
-```
-helm install --namespace app --create-namespace restaurant ./app-helm-chart
-```
-
-### Configure /etc/hosts
-
-**Linux/macOS**:
-```bash
-# Replace hostnames if you changed them in values.yaml
-sudo sh -c "echo '192.168.56.91 app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local' >> /etc/hosts"
-
-# Check if the hostnames are correctly added to the /etc/hosts file
-cat /etc/hosts
-```
-
-**Windows** (Run PowerShell as Administrator):
-```powershell
-Add-Content -Path "C:\Windows\System32\drivers\etc\hosts" -Value "192.168.56.91 app-frontend.k8s.local app-service.k8s.local canary.app-service.k8s.local"
-```
-
-### Access application
-
-Now, you can access the frontend of the application by just going to `app-frontend.k8s.local` in your browser.
-
----
-
-## Accessing Grafana Dashboard
-
-1. Access Grafana UI using port forwarding:
-```bash
-kubectl port-forward -n '<app-namespace>' svc/<app-name>-grafana 1234:80
-```
-
-- Navigate to: http://localhost:1234
-
-2. Log in to Grafana
-- Default credentials:
-  - Username: `admin`
-  - Password: `prom-operator` (for kubernetes cluster deployment)
-
-Note: The port number (1234) can be changed to any available port on your local machine.
-
-3. Import the Dashboard
-- In the Grafana UI:
-  1. Go to **Dashboards** in the left sidebar
-  2. Click **New** → **Import**
-  3. Upload the dashboard JSON file or paste the JSON content
----
+    # If you used vagrant
+    # Navigate to the '/vagrant' folder
+    vagrant destroy -f
+    ```

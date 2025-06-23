@@ -120,10 +120,9 @@ grafana:
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
-
 alertCreds:
-  username: "" # Will be set during helm installation
-  password: ""
+  username: "remla2025team9.alerts@gmail.com"
+  password: "team9-alerts"
 
 kube-prometheus-stack:
   prometheusOperator:
