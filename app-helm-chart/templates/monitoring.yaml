@@ -4,12 +4,12 @@ metadata:
   name: {{ .Release.Name }}-app-service-servicemonitor
   namespace: {{ .Release.Namespace }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     release: {{ .Release.Name }}
 spec:
   selector:
     matchLabels:
-      app: app-service
+      app: {{ .Release.Name }}-app-service
   namespaceSelector:
     matchNames:
       - {{ .Release.Namespace }}
@@ -24,7 +24,7 @@ metadata:
   name: {{ .Release.Name }}-reviews-submitted-alert
   namespace: {{ .Release.Namespace }}
   labels:
-    app: app-service
+    app: {{ .Release.Name }}-app-service
     release: {{ .Release.Name }}
 spec:
   groups:
@@ -46,7 +46,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Release.Name }}
-    app: app-service
+    app: {{ .Release.Name }}-app-service
 type: Opaque
 stringData:
   smtp_auth_username: {{ .Values.alertCreds.username | quote }}
