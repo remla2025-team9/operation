@@ -16,7 +16,14 @@ You can click on the repository name to navigate to the corresponding GitHub pag
 | [lib-version](https://github.com/remla2025-team9/lib-version)       | A lightweight library for managing and retrieving the application version.                            |
 | [operation](https://github.com/remla2025-team9/operation)           | Orchestrates all services using Docker Compose, Helm for Kubernetes, and Vagrant for VM provisioning. |
 
----
+
+
+## Project Structure
+
+- **`docker-compose/`** - Contains Docker Compose files and environment configurations for local development
+- **`app-helm-chart/`** - Kubernetes deployment files using Helm
+- **`vagrant/`** - Scripts to provision a multi-node Kubernetes cluster using VMs through Vagrant and Ansible
+- **`docs/`** - Documentation files
 
 ## Getting Started
 
@@ -41,11 +48,11 @@ This is the simplest way to get all services running on your local machine.
     ```
 
 2.  **Configure Environment:**
-    Copy the example environment files. The default values are suitable for most local setups.
+    Copy the template environment files. The default values are suitable for most local setups.
     ```bash
-    cp app-service.env.example app-service.env
-    cp app-frontend.env.example app-frontend.env
-    cp model-service.env.example model-service.env
+    cp env-files/app-service.env.template env-files/app-service.env
+    cp env-files/app-frontend.env.template env-files/app-frontend.env
+    cp env-files/model-service.env.template env-files/model-service.env
     ```
 
 3.  **Start Services:**
@@ -55,8 +62,8 @@ This is the simplest way to get all services running on your local machine.
     ```
 
 4.  **Access Services:**
-    *   Frontend: `http://localhost:8080`
-    *   Backend API: `http://localhost:5001`
+    *   App-frontend: `http://localhost:3000`
+    *   App-backend: `http://localhost:5000`
 
 5.  **Stop Services:**
     ```bash
@@ -80,8 +87,7 @@ Choose one of the following options to prepare your cluster, either Minikube or 
 
 ---
 
-<details>
-<summary><strong>Option A: Using Minikube</strong></summary>
+### Option A: Using Minikube
 
 ---
 
@@ -118,12 +124,9 @@ Choose one of the following options to prepare your cluster, either Minikube or 
     ```
 Your Minikube cluster is now prepared. Proceed to **Step 2: Deploy the Application with Helm**.
 
-</details>
-
 ---
 
-<details>
-<summary><strong>Option B: Using Vagrant and Ansible</strong></summary>
+### Option B: Using Vagrant and Ansible
 
 ----
 
@@ -172,7 +175,11 @@ vagrant up
 ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
 ```
 
-Your cluster is now running. A `kubeconfig` file to access it is located at `vagrant/config/.kubeconfig`. You can use it by setting the `KUBECONFIG` environment variable to this file.
+Your cluster is now running. A `kubeconfig` file to access it is located at `vagrant/config/.kubeconfig`. You can use it by setting the `KUBECONFIG` environment variable to this file or simply use the following command.
+
+```bash
+kubectl --kubeconfig config/.kubeconfig ...
+```
 
 Proceed to **Step 2: Deploy the Application with Helm**.
 
@@ -242,8 +249,8 @@ To access the application from your browser, you must map the service hostnames 
 
 3.  **Access the Application in Your Browser:**
     You can now navigate to the services:
-    *   **Frontend:** `http://app-frontend.k8s.local`
-    *   **Backend API:** `http://app-service.k8s.local`
+    *   **App-frontend:** `http://app-frontend.k8s.local`
+    *   **App-backend:** `http://app-service.k8s.local`
 
 
 ## Interacting with Your Kubernetes Deployment
