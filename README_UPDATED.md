@@ -323,6 +323,10 @@ Follow the steps corresponding to the method you used to run the application.
     helm uninstall my-app
 
     # Stop the Kubernetes cluster itself
-    minikube stop      # If you used Minikube
-    vagrant destroy -f # If you used Vagrant
+    # If you used Minikube
+    minikube stop
+
+    # If you used vagrant
+    # Navigate to the '/vagrant' folder
+    vagrant destroy -f
     ```
