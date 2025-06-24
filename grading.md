@@ -14,6 +14,7 @@ We have structured this document by assignment, with a subsection for each rubri
 *   **Implementation:**
     - The GitHub organization follows the requested template
     - All relevant information is accessible
+    - The `operation` folder contains a `README.md` file with the information to find and start the application
     - The `operation` folder contains the `grading.md` file
 *   **Notes for the Grader:**
 
@@ -22,7 +23,7 @@ We have structured this document by assignment, with a subsection for each rubri
 *   **Expected Level:** `Pass`
 *   **Implementation:**
     - The frontend allows querying the model
-    - Additional interactions exist that allow users to change incorrect predictions
+    - Additional interactions exist that allow users to provide feedback by correcting incorrect predictions
 *   **Notes for the Grader:**
 
 ### Automated Release Process
@@ -160,9 +161,19 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### App Monitoring
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** The app has a total of 9 app-specific metrics for reasoning about users behavior or model performance.
+    - **(Sufficient)** The metrics include at least a `Gauge` and a `Counter`.
+    - **(Sufficient)** The metrics are automatically discovered by Prometheus through applying `ServiceMonitor` resource.
+    - **(Good)** An app-specific `Histogram` metric is defined to track the distribution of response times for the model service.
+    - **(Good)** Each metric type has at least one metric defined in the code and broken down with labels.
+    - **(Excellent)** An `AlertManager` is configured with a `PrometheusRule` that triggers an alert if the number of reviews submitted exceeds 5 over a 5-minute window.
+    - **(Excellent)** A corresponding `Alert` is raised and sent by mail to the configured email address when the alert condition is met.
+    - **(Excellent)** The deployment files do not contain any hardcoded credentials or sensitive information, but instead uses Kubernetes Secrets to manage sensitive data securely, and the `README.md` file provides instructions on how to set up the necessary secrets on runtime.
 *   **Notes for the Grader:**
+    - The metrics are defined in the `app-service` repository, specifically in the `src/metrics.py` file.
+    - The Prometheus configuration for the alerts can be found in the `operation` repository, specifically in the `app-helm-chart/templates/monitoring.yaml` file.
 
 ### Grafana
 
@@ -198,9 +209,19 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Continuous Training
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** The execution of tests and linter are included in the `testing.yaml` workflow.
+    - **(Sufficient)** `pytest` runs all tests on every push to the main branch in the `testing.yaml` workflow.
+    - **(Sufficient)** `pylint` runs on every push to the main branch in the `testing.yaml` workflow.
+    - **(Good)** The test adequacy metrics are calculated during the `testing.yaml` workflow execution.
+    - **(Good)** Test coverage is measured during the `testing.yaml` workflow execution.
+    - **(Excellent)** The test adequacy metrics are reported back and automatically added in the `README.md` file on every run of the `testing.yaml` workflow.
+    - **(Excellent)** The test coverage is reported back and automatically added in the `README.md` file on every run of the `testing.yaml` workflow.
+    - **(Excellent)** The `pylint` linting score is added to the `README.md` file as a badge on every run of the `testing.yaml` workflow.
 *   **Notes for the Grader:**
+    - The `testing.yaml` workflow is located in the `.github/workflows` directory of the `model-training` repository.
+    - The test adequacy metrics and coverage are automatically added to the `README.md` file in the `model-training` repository.
 
 ### Project Organization
 
