@@ -305,7 +305,7 @@ Grafana is installed for monitoring application metrics.
 
 3.  **Available Dashboards:**
     The Helm chart includes two custom dashboards pre-configured in Grafana:
-    *   **Application Dashboard:** Provides overall system metrics obtained from Prometheus.
+    *   **grafana-dashboard:** Provides overall system metrics obtained from Prometheus.
     *   **Experiment Dashboard:** Specifically designed for the canary experiment, showing key metrics for comparing stable and canary versions.
 
     These dashboards can be accessed from the Grafana dashboard page after login.
