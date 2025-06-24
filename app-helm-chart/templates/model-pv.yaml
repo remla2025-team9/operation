@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-model-cache-pv-{{ .Values.versions.stable.versionLabel }}
+  labels:
+    app: {{ .Values.modelService.dnsName }}
+spec:
+  capacity:
+    storage: {{ .Values.modelService.persistence.size }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: /mnt/shared/{{ .Release.Name }}-model-cache-{{ .Values.versions.stable.versionLabel }}
+---
+{{- if and .Values.modelService.canary.enabled .Values.versions.canary.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-model-cache-pv-{{ .Values.versions.canary.versionLabel }}
+  labels:
+    app: {{ .Values.modelService.dnsName }}
+spec:
+  capacity:
+    storage: {{ .Values.modelService.persistence.size }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  hostPath:
+    path: /mnt/shared/{{ .Release.Name }}-model-cache-{{ .Values.versions.canary.versionLabel }}
+{{- end }}

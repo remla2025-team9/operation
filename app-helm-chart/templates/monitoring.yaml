@@ -55,7 +55,7 @@ stringData:
 apiVersion: monitoring.coreos.com/v1
 kind: Alertmanager
 metadata:
-  name: {{ .Release.name }}-reviews-submitted-alertmanager
+  name: {{ .Release.Name }}-reviews-submitted-alertmanager
   namespace: {{ .Release.Namespace }}
   labels:
     release: {{ .Release.Name }}

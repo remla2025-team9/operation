@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-app-frontend-config-{{ .Values.versions.stable.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-app-frontend
+    version: {{ .Values.versions.stable.versionLabel }}
+data:
+  APP_SERVICE_URL: "http://{{ .Values.appService.ingress.host }}:{{ .Values.appService.service.port}}"
+  {{- range $key, $val := .Values.appFrontend.stable.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app-frontend-deployment-{{ .Values.versions.stable.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-app-frontend
+    version: {{ .Values.versions.stable.versionLabel }}
+spec:
+  replicas: {{ .Values.appFrontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app-frontend
+      version: {{ .Values.versions.stable.versionLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app-frontend
+        version: {{ .Values.versions.stable.versionLabel }}
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: {{ .Release.Name }}-app-frontend
+          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.stable.image.tag }}"
+          imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appFrontend.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-app-frontend-config-{{ .Values.versions.stable.versionLabel }}
+{{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-app-frontend-config-{{ .Values.versions.canary.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-app-frontend
+    version: {{ .Values.versions.canary.versionLabel }}
+data:
+  APP_SERVICE_URL: "http://{{ .Values.appService.ingress.host }}:{{ .Values.appService.service.port}}"
+  {{- range $key, $val := .Values.appFrontend.canary.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app-frontend-deployment-{{ .Values.versions.canary.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-app-frontend
+    version: {{ .Values.versions.canary.versionLabel }}
+spec:
+  replicas: {{ .Values.appFrontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app-frontend
+      version: {{ .Values.versions.canary.versionLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app-frontend
+        version: {{ .Values.versions.canary.versionLabel }}
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: {{ .Release.Name }}-app-frontend
+          image: "{{ .Values.appFrontend.image.repository }}:{{ .Values.appFrontend.canary.image.tag }}"
+          imagePullPolicy: {{ .Values.appFrontend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.appFrontend.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-app-frontend-config-{{ .Values.versions.canary.versionLabel }}
+{{- end }}

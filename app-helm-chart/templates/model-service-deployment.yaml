@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-config-{{ .Values.versions.stable.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+    version: {{ .Values.versions.stable.versionLabel }}
+data:
+  {{- range $key, $val := .Values.modelService.stable.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-deployment-{{ .Values.versions.stable.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+spec:
+  replicas: {{ .Values.modelService.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+      version: {{ .Values.versions.stable.versionLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+        version: {{ .Values.versions.stable.versionLabel }}
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.stable.image.tag }}"
+          imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.modelService.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-config-{{ .Values.versions.stable.versionLabel }}
+          volumeMounts:
+            - name: model-cache-storage
+              mountPath: /root/.cache
+      volumes:
+        - name: model-cache-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-model-cache-pvc-{{ .Values.versions.stable.versionLabel }}
+---
+{{- if and .Values.modelService.canary.enabled .Values.versions.canary.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-config-{{ .Values.versions.canary.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+    version: {{ .Values.versions.canary.versionLabel }}
+data:
+  {{- range $key, $val := .Values.modelService.canary.config }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-deployment-{{ .Values.versions.canary.versionLabel }}
+  labels:
+    app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+spec:
+  replicas: {{ .Values.modelService.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+      version: {{ .Values.versions.canary.versionLabel }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+        version: {{ .Values.versions.canary.versionLabel }}
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}
+          image: "{{ .Values.modelService.image.repository }}:{{ .Values.modelService.canary.image.tag }}"
+          imagePullPolicy: {{ .Values.modelService.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.modelService.port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-{{ .Values.modelService.dnsName }}-config-{{ .Values.versions.canary.versionLabel }}
+          volumeMounts:
+            - name: model-cache-storage
+              mountPath: /root/.cache
+      volumes:
+        - name: model-cache-storage
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-model-cache-pvc-{{ .Values.versions.canary.versionLabel }}
+{{- end }}

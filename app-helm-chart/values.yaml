@@ -1,17 +1,32 @@
+# Global version settings that allow for one canary deployment and traffic splitting between stable and canary version.
+versions:
+  stable:
+    versionLabel: "stable"
+    # The destinationWeight is used to control the traffic split between stable and canary versions.
+    destinationWeight: 10
+  canary:
+    # This setting enables canary deployments for every service that supports it.
+    enabled: true
+    versionLabel: "canary"
+    # The destinationWeight is used to control the traffic split between stable and canary versions.
+    destinationWeight: 90
+
 # model-service settings
 modelService:
+  # This setting is used to set the DNS name for the model service as required by the assignment.
+  dnsName: model-service
   replicas: 1
   stable:
-    versionLabel: stable
     image:
       tag: latest
     config:
       MODEL_VERSION: "v0.0.3-pre.0"
       SERVICE_PORT: "5001"
       SERVICE_HOST: "0.0.0.0"
+  # Canary deployment settings specific to the model service.
   canary:
+    # This setting enables a canary deployment for the model service.
     enabled: true
-    versionLabel: canary
     image:
       tag: canary
     config:
@@ -22,7 +37,6 @@ modelService:
     repository: ghcr.io/remla2025-team9/model-service
     pullPolicy: Always
   port: 5001
-  # secretName: example-secret
   persistence:
     size: 1Gi
 
@@ -30,24 +44,22 @@ modelService:
 appService:
   replicas: 1
   stable:
-    versionLabel: "stable"
-    host: "app-service.k8s.local"
     image:
       tag: latest
     config:
-      MODEL_SERVICE_URL: "http://model-service:5001"
+      # The MODEL_SERVICE_URL is set in the configMap of the app-service as it can't be resolved in values.yaml
       FLASK_ENV: "production"
       FLASK_RUN_HOST: "0.0.0.0"
       FLASK_RUN_PORT: "5000"
       APP_VERSION_LABEL: "stable" # Label used by Prometheus to identify the version
+  # Canary deployment settings specific to the app service.
   canary:
+    # This setting enables a canary deployment for the app service.
     enabled: true
-    versionLabel: "canary"
-    host: "canary.app-service.k8s.local"
     image:
       tag: canary
     config:
-      MODEL_SERVICE_URL: "http://model-service:5001"
+      # The MODEL_SERVICE_URL is set in the configMap of the app-service as it can't be resolved in values.yaml
       FLASK_ENV: "production"
       FLASK_RUN_HOST: "0.0.0.0"
       FLASK_RUN_PORT: "5000"
@@ -58,23 +70,25 @@ appService:
   port: 5000
   service:
     port: 80
+  ingress:
+    host: "app-service.k8s.local"
 
 # app-frontend settings
 appFrontend:
   replicas: 1
   stable:
-    versionLabel: "stable"
     image:
       tag: latest
     config:
-      APP_SERVICE_URL: "http://app-service.k8s.local"
-  canary: 
+      # Additional environment variables for the stable version of the app frontend. Currently empty.
+  # Canary deployment settings specific to the app frontend.
+  canary:
+    # This setting enables a canary deployment for the app frontend.
     enabled: true
-    versionLabel: "canary"
     image:
       tag: canary
     config:
-      APP_SERVICE_URL: "http://canary.app-service.k8s.local"
+      # Additional environment variables for the stable version of the app frontend. Currently empty.
   image:
     repository: ghcr.io/remla2025-team9/app-frontend
     pullPolicy: Always
@@ -91,25 +105,25 @@ appSecret:
 # grafana settings
 grafana:
   dashboardProviders:
-   dashboardproviders.yaml:
-     apiVersion: 1
-     providers:
-     - name: 'default'
-       orgId: 1
-       folder: ''
-       type: file
-       disableDeletion: false
-       editable: true
-       options:
-         path: /var/lib/grafana/dashboards/default
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: "default"
+          orgId: 1
+          folder: ""
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
 
   dashboardsConfigMaps:
     default: "grafana-dashboards"
 
-
+# Alert credential settings. Should be configured to make sending email alerts possible.
 alertCreds:
-  username: "" # Will be set during helm installation
-  password: ""
+  username: "" # Username for alerting credentials, if required (see README for details)
+  password: "" # Password for alerting credentials, if required (see README for details)
 
 kube-prometheus-stack:
   prometheusOperator:

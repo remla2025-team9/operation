@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ .Release.Name }}-app-frontend-dr
+spec:
+  host: {{ .Release.Name }}-app-frontend
+  subsets:
+    - name: {{ .Values.versions.stable.versionLabel }}
+      labels:
+        version: {{ .Values.versions.stable.versionLabel }}
+    {{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
+    - name: {{ .Values.versions.canary.versionLabel }}
+      labels:
+        version: {{ .Values.versions.canary.versionLabel }}
+    {{- end }}
+

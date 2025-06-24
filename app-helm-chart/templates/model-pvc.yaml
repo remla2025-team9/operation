@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-model-cache-pvc-{{ .Values.versions.stable.versionLabel }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: {{ .Release.Name }}-model-cache-pv-{{ .Values.versions.stable.versionLabel }}
+  storageClassName: manual
+---
+{{- if and .Values.modelService.canary.enabled .Values.versions.canary.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-model-cache-pvc-{{ .Values.versions.canary.versionLabel }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  volumeName: {{ .Release.Name }}-model-cache-pv-{{ .Values.versions.canary.versionLabel }}
+  storageClassName: manual
+{{- end }}
