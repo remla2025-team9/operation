@@ -33,7 +33,7 @@ We have structured this document by assignment, with a subsection for each rubri
     - **(Excellent)** After every push to main (and thus also after merging branches to main), the pre-version tag is automatically bumped using a counter (e.g. from `v0.0.1-pre-2` to `v0.0.1-pre-3`). This gives support for multiple versions of the same pre-release.
     - **(Excellent)**   We have implemented a deployment workflow that is triggered manually with the click of a button in the GitHub Actions tab for all repositories. The bump level (patch, minor, major) can be set for this workflow when triggering manually. If the previous version was a pre-release, the pre-tag is removed for the stable release (e.g. for a patch bump, `v0.0.1-pre-2` will become `v0.0.1`, and for a minor bump, `v0.0.1-pre-2` will become `v0.1.0`).
     - **(Excellent)**   `app-frontend`, `app-service`, and `model-service` have a multi-stage Dockerfile.
-    - **(Excellent)**   The images that are automatically released by `app-frontend`, `app-service`, and `model-service` support the `amd64` and `arm64` architectures.
+    - **(Excellent)**   The images that are automatically released by `app-frontend`, `app-service`, and `model-service` supporting the `amd64` and `arm64` architectures.
 *   **Notes for the Grader:**
 
 ### Software Reuse in Libraries
@@ -155,8 +155,11 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Helm Installation
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** A helm chart exists that covers the complete deployment  
+    - **(Good)** The helm chart is configurable via a values.yaml file and the dns name of the model-service can be modified in it.  
+    - **(Excellent)** All names and labels are prefixed with the release name using {{ Release.Name }} to enable mutiple installments of the same Helm chart in the same cluster.  
 *   **Notes for the Grader:**
 
 ### App Monitoring
@@ -225,8 +228,9 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Project Organization
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - 
 *   **Notes for the Grader:**
 
 ### Pipeline Management with DVC
@@ -249,6 +253,11 @@ We have structured this document by assignment, with a subsection for each rubri
 
 *   **Expected Level:** `[Your Expected Level]`
 *   **Implementation:**
+    - **(Sufficient)** A Gateway and VirtualServices are defined.  
+    - **(Sufficient)** The application is accessible through an Ingress Gateway. Locally by adding the hosts and the ingress ip to the etc/hosts file.
+    - **(Good)** DestinationRules are used and weights can be configured in the values.yaml file to enable traffic splitting between different versions of the app  
+    - **(Good)** The versions of model-service and the app are consistent by checking the app-service version of the request when traffic arrives at the model service.
+    - **(Excellent)** Sticky sessions are achieved by setting a cookie in the front-end upon the first request. This cookie is checked in the app-frontend VirtualService to respond with the same version as in the cookie. The cookie is also used to access the correct version of the app-service by setting a header parameter with the correct version when sending a request to the app-service from the frontend, achieving consistency. The app-service VirtualService checks this specific header parameter and responds with the version that is in this header parameter. 
 *   **Notes for the Grader:**
 
 ### Additional Use Case
@@ -261,9 +270,18 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Continuous Experimentation
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)**  The documentation describes the experiment in detail, including the effect experimented on, implemented changes and the relevant metric.
+    - **(Sufficient)** The experiment involves two version of the app-frontend, app-service, and model-service. All 6 versions have their own images (tagged with :latest for stable, and :canary for canary)
+    - **(Sufficient)** Both component versions are reachable. The README also describes a way to consistently get one version for testing
+    - **(Sufficient)** The metric is implemented in the app-service and described in the docs
+    - **(Good)** Prometheus picks up this metric
+    - **(Good)** We created a Grafana dashboard named "Experiment Dashboard". The configuration is located in app-helm-chart/grafana-dashboards/experiment-dashboard.json
+    - **(Good)** The documentation contains a screenshot of this dashboard
+    - **(Excellent)** The documentation clearly describes the decision process. 
 *   **Notes for the Grader:**
+    - Both the README and the docs describe the experiment and how to interact with it very well.
 
 ### Deployment Documentation
 
