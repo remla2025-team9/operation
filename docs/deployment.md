@@ -8,17 +8,26 @@ This document provides a conceptual overview of our deployment architecture and 
 
 Our deployment consists of three main application components, monitoring infrastructure, and supporting Kubernetes/Istio resources:
 
+### Core application components
 - **App Frontend**: User-facing web application.
 - **App Service**: Backend API, mediates between frontend and model.
 - **Model Service**: Serves ML model predictions.
-- **Monitoring Stack**: Prometheus and Grafana for metrics and dashboards.
-- **Istio Service Mesh**: Handles traffic management, security, and observability.
-- **Persistent Storage**: For model cache.
 
-**Other resources:**
+### Monitoring stack
+- **Prometheus**: Collects metrics from core application and define alerts.
+- **Grafana**: Visualizes metrics and provides dashboards for our custom metrics.
+- **AlertManager**: Sends email alerts based on Prometheus rules.
+
+### Service Mesh
+
+- **Istio Gateway**: Entry point for external HTTP traffic.
+- **VirtualServices** & **DestinationRules**: Intelligent traffic routing.
+- **EnvoyFilters**: Enforce rate limiting policies.
+
+### Storage and Configuration
 - **ConfigMaps**: Grafana dashboards.
 - **PersistentVolumes/Claims**: Model cache storage.
-- **ServiceMonitors/PrometheusRules**: For monitoring and alerting.
+- **Secrets**: Store sensitive information like AlertManager SMTP credentials.
 
 ---
 
@@ -26,27 +35,34 @@ Our deployment consists of three main application components, monitoring infrast
 
 ![Deployment Structure](images/deployment.png)
 
-This diagram illustrates the high-level architecture and data flow of our deployment, including the relationships between the app-frontend, app-service, model-service, and the Istio infrastructure.
+The diagram above shows:
+* The Kubernetes Deployments and their relationships
+* Communication paths between components
+* How Istio resources such as VirtualServices and DestinationRules route traffic. While DestinationRules are not explicitly shown, they are implied in the routing logic of VirtualServices. In our deployment, they define subsets for each service version (v1, v2) to enable traffic splitting and version management, as well as sticky sessions (ensuring users consistently hit the same service version).
 
 ---
 
 ## 3. **Kubernetes Resources Overview**
 
 - **Deployments**: Each service (frontend, backend, model) is deployed as a Kubernetes Deployment, supporting multiple versions for experiments.
+    - To enable canary deployments, we deploy one Deployment resource for each version and use labels to differentiate versions (e.g., `app=app-frontend, version=stable` and `app=app-frontend, version=canary`).
 - **Services**: Expose each Deployment internally in the cluster.
 - **PersistentVolumes/Claims**: Provide storage for model cache, ensuring model artifacts persist across pod restarts.
 - **Secrets & ConfigMaps**: Store sensitive and non-sensitive configuration, injected into pods as environment variables or files.
-- **Monitoring**: Prometheus and Grafana are deployed via Helm charts, with ServiceMonitors and dashboards configured for metrics collection and visualization.
-
+- **Monitoring**: Prometheus and Grafana are deployed via Helm charts, with dashboards configured for metrics collection and visualization.
+    - **ServiceMonitors**: Automatically discover and scrape metrics from application services.
+    - **PrometheusRules**: Define alerting rules for Prometheus (load increase)
+    - **AlertManager**: Configured to send email alerts based on Prometheus rules.
 ---
 
 ## 4. **Istio Service Mesh Components**
 
 - **Gateway**: Entry point for all external traffic into the cluster.
-- **VirtualServices**: Define routing rules for HTTP traffic, enabling advanced traffic management.
-- **DestinationRules**: Define subsets (v1, v2) for each service, enabling version-based routing and load balancing strategies.
+- **VirtualServices**: Define routing rules for HTTP traffic. 
+    - Routes requests to specific service versions (by default, 90% to v1, 10% to v2, although configurable in the helm chart).
+    - Uses cookie-based routing to ensure user sessions are sticky to a specific version.
+- **DestinationRules**: Define subsets for each service, enabling version-based routing and sticky sessions.
 - **EnvoyFilters**: Used for rate limiting.
-- **Sidecar Injection**: All application pods have Istio sidecars enabling the service mesh.
 
 ---
 
@@ -54,24 +70,18 @@ This diagram illustrates the high-level architecture and data flow of our deploy
 
 ### **External Request Flow**
 
-1. **User Request**: A user accesses the frontend via a DNS name (e.g., `app-frontend.k8s.local`).
+1. **User Request**: A user accesses the frontend via a DNS name (`app-frontend.k8s.local`).
 2. **Gateway**: The request enters the cluster through the Istio Gateway.
-3. **VirtualService Routing**: Istio routes the request to the appropriate frontend pod, potentially splitting traffic between versions (90% to v1, 10% to v2).
+3. **VirtualService Routing**: Istio routes the request to the appropriate frontend pod, splitting traffic between versions (90% to stable, 10% to canary). To ensure sticky sessions, the a cookie will be set at this stage which allows the user to consistently hit the same version of the frontend.
 4. **Frontend to Backend**: The frontend calls the backend API (`app-service`) via its internal service name. Using VirtualServices, we ensure that the same version of the backend is used consistently for the frontend version.
 5. **Backend to Model**: The backend calls the model service for predictions. The model service can also have multiple versions, and the backend uses VirtualServices to route requests to the appropriate model version.
 6. **Response Propagation**: The response flows back through the same path to the user.
 
 ### **Dynamic Traffic Routing**
 
-- **A/B Testing / Canary Releases**: VirtualServices and DestinationRules allow us to direct a percentage of traffic to different versions of a service (90% to v1, 10% to v2), enabling safe experimentation and gradual rollouts.
-- **Header-Based Routing**: Some routes use HTTP headers (`x-user`) for consistent hashing, ensuring user sessions are sticky to a particular version.
+- **Canary Releases**: VirtualServices and DestinationRules allow us to direct a percentage of traffic to different versions of a service (90% to stable, 10% to canary), enabling safe experimentation and gradual rollouts.
+- **Cookie-Based Routing**: Some routes use HTTP cookies for consistent hashing, ensuring user sessions are sticky to a particular version.
 - **Rate Limiting**: EnvoyFilters can enforce rate limits at the gateway level.
-
-### **Monitoring and Observability**
-
-- **Prometheus**: Scrapes metrics from all services and the Istio mesh.
-- **Grafana**: Visualizes metrics and alerts, with dashboards for application and infrastructure health.
-- **PrometheusRules**: Define alerts (e.g., high error rates, latency spikes).
 
 ---
 
