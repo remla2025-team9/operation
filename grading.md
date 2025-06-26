@@ -263,7 +263,7 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Traffic Management
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Sufficient)** A Gateway and VirtualServices are defined.  
     - **(Sufficient)** The application is accessible through an Ingress Gateway. Locally by adding the hosts and the ingress ip to the etc/hosts file.
