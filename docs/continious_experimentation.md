@@ -93,7 +93,12 @@ These metrics monitor the health and performance of the application versions.
 
 ## 6. Experiment Setup & Traffic Management
 
-*   **Canary Deployment:** The `canary` versions of `app-frontend`, `app-service`, and `model-service` will be deployed alongside their `stable` counterparts. Image tags for these canary deployments will be `:canary`, managed via our "Canary Feature Deployment" CI/CD pipeline that can be manually triggered in GitHub Action on a feature branch. Crucially, the `stable` and `canary` deployments for `app-service` will be configured with a distinct environment variable, `APP_VERSION_LABEL` (set to "stable" or "canary" respectively). This environment variable is used within the application to label the emitted metrics, allowing for clear differentiation of  metrics picked up by Prometheus.
+*   **Canary Deployment:** The `canary` versions of `app-frontend`, `app-service`, and `model-service` will be deployed alongside their `stable` counterparts. Image tags for these canary deployments will be `:canary`, managed via our "Canary Feature Deployment" CI/CD pipeline that can be manually triggered in GitHub Action on a feature branch. The specific canary branches containing the confidence score feature are:
+    *   **app-frontend:** `18-canary-experiment`
+    *   **app-service:** `14-canary-experiment`
+    *   **model-service:** `12-canary-experiment`
+    
+    Crucially, the `stable` and `canary` deployments for `app-service` will be configured with a distinct environment variable, `APP_VERSION_LABEL` (set to "stable" or "canary" respectively). This environment variable is used within the application to label the emitted metrics, allowing for clear differentiation of  metrics picked up by Prometheus.
 
 *   **Traffic Splitting:** We will use Istio to manage traffic. Initially, a small percentage of user traffic (e.g., 10%) will be directed to the `canary` stack, while the remaining 90% will continue to use the `stable` stack. This will be configured using Istio `VirtualService` and `DestinationRule` resources for each of the three services (`app-frontend`, `app-service`, `model-service`) to ensure consistent routing (i.e., a user hitting `app-frontend-canary` will use `app-service-canary` and `model-service-canary`).
 

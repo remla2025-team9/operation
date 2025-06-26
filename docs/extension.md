@@ -1,216 +1,186 @@
-# Automating Reproducible Artifact Generation in CI Pipelines
+# Automating Local Kubernetes Environment Setup using a Makefile
 
-## 1. Context and Problem Statement
+This document proposes an automated solution to the local development environment setup process for our sentiment analysis application, replacing manual command sequences with a simple, reliable automation framework. This proposal is specifically written for the Minikube environment setup.
 
-Over the last few sprints, our DVC pipeline sometimes becomes inconsistent at the preprocessing stage because `preprocessor.joblib` is tracked as an output. Even when neither the raw data nor the preprocessing script changes, the serialized transformer’s checksum varies on each run. That leads to messages like:
+## Context and Problem Statement
 
-```
-WARNING: Some cache files do not exist… Missing cache files: edcffd9f…
-ERROR: failed to pull data from the cloud – Checkout failed for preprocessor.joblib
-```
+Our project has an advanced setup that lets us run it in two ways: using Docker Compose for simple, local tasks, and using a full Kubernetes setup that acts like our live environment. While this flexibility is a major advantage, the process for setting up the Kubernetes environment has become a significant problem.
 
-In practice, this causes three main issues:
+Currently, any developer who wants to run the project locally on Kubernetes must follow a long and complicated list of manual steps from the `README` file. This involves juggling multiple different tools and making changes to important system files that require administrator access.
 
-1. **Cloning and pulling from DVC**  
-   When team members clone the repository and run `dvc pull` without making any changes, they see a “missing cache” error for `preprocessor.joblib`.
+This proposal will focus on fixing the setup process for **Minikube**, which is the most common way our team develops locally. While our other setup option (Vagrant) is more automated, it still has some manual steps that could be improved later using the ideas from this proposal.
 
-2. **Manual intervention leads to downstream instability**  
-   If someone deletes or replaces `preprocessor.joblib` by hand, downstream stages, feature generation, model training, and evaluation, fail because they expect a stable preprocessor object.
+In practice, the current manual process for Minikube causes several critical issues:
 
-3. **Inconsistent CI results due to non-determinism**  
-   Automated tests that load `preprocessor.joblib` fail at random. That leaves our CI builds red and blocks merges.
+*   **A long list of commands:** A developer has to run over a dozen commands in a precise order. This includes starting the local cluster with specific memory and CPU settings, installing extra tools, applying special configurations, and setting specific system labels.
 
-We aim to improve reproducibility and reduce manual overhead in our release process: after cloning and running `dvc pull`, a simple `dvc repro` should generate the same `preprocessor.joblib` and let all later stages run without manual intervention.
+*   **Risky manual system changes:** The most fragile step requires a developer to find an IP address and then manually edit a critical system file (`/etc/hosts`). A single typo or mistake here can break the entire setup, leading to confusing errors that are very hard for new team members to fix.
 
-## 2. Why It Matters
+*   **Inconsistent setups for each developer:** When everyone sets up their environment by hand, small differences are bound to happen. This leads to the classic "it works on my machine" problem, where code works for one person but fails for another, or breaks in our automated testing system.
 
-- **Wasted developer time**  
-  Every “missing cache” incident costs at least 30 minutes of debugging (digging through logs, clearing caches, re-running `dvc add`, etc.). Over weeks, that adds up to several hours.
+*   **Security risks and permission hurdles:** The process requires administrator access to change a core system file. This can be a security concern and is often blocked in certain work environments. Furthermore, running the provided command more than once can make the file messy and cause future problems.
 
-- **Reproducibility requirements**  
-  In research-oriented projects, reproducibility is mandatory. When preprocessor artifacts change unpredictably, we cannot be sure experiments on one machine match those on another.
+The core of the problem is simple. Our project onboarding relies on following a long list of steps by hand instead of running a single, automated script. This fragility weakens our team's ability to get up and running quickly and reliably.
 
-- **Fragile CI**  
-  Our GitHub Actions CI assumes `dvc pull && dvc repro` will succeed. With the current setup, PRs often fail CI tests and require manual fixes or skipped tests. That undermines validation.
 
-- **Onboarding difficulty**  
-  New team members or interns spend more time fixing DVC problems than understanding our pipeline’s logic. That creates a bad first impression.
+## Why It Matters
 
-## 3. Feature Addition: Automated Artifact Generation and CI Validation
+The current setup procedure causes real problems that slow down the entire project. Relying on these manual steps hurts us in four key ways: it wastes time, creates bugs, makes it hard for new people to start, and goes against our own engineering standards.
 
-To improve automation, ensure reproducibility, and strengthen CI validation, we introduce a feature that enables deterministic preprocessing and verifies artifact integrity automatically:
+*   **Significant loss of developer productivity**  
+    The manual process is a drain on the team's time. If a developer makes one small mistake during setup, like a typo in a command, their environment breaks. It can then take them **30 to 60 minutes** to figure out what went wrong and fix it. This isn't just a one-time problem, it can happen every time someone needs to set up or reset their computer. All this time is spent fixing setup problems instead of building new features or making our project better.
 
-### A. Stop Tracking `preprocessor.joblib` Directly in DVC
+*   **Increased risk of integration errors**  
+    Because everyone sets up their computer by hand, each person's environment ends up being slightly different. This leads to the classic "it works on my machine" problem, where code that works perfectly for one person fails for everyone else when it's added to the main project. These failures cause delays, as the team has to stop and investigate what went wrong. It makes our automated quality checks less trustworthy and slows down our ability to release new updates.
 
-1. **Reason**  
-   DVC is ideal for tracking large files whose contents stay the same when inputs do not change. Our `preprocessor.joblib` includes metadata, timestamps or memory addresses, that change on every run. As a result, its checksum fluctuates even if code and data are unchanged.
+*   **Slower onboarding for new team members**  
+    Getting started on a project should be easy. The hard part should be the project's real challenges, not the setup instructions. Our current lengthy and error-prone process is a major roadblock for new contributors. Instead of being able to start contributing right away, they often spend their first days fighting with complex steps and debugging their environment. This is frustrating and can be very discouraging for someone new to the project.
 
-2. **Implementation steps**  
-   - Run:
-     ```bash
-     dvc remove preprocessor.joblib.dvc
-     git rm preprocessor.joblib.dvc
-     git commit -m "Stop tracking preprocessor.joblib in DVC"
-     ```
-   - Add `preprocessor.joblib` to both `.gitignore` and `.dvcignore`:
-     ```
-     # .gitignore and .dvcignore
-     preprocessor.joblib
-     ```
+*   **Lack of environment reproducibility**  
+    Our project is built on the idea that our work should be reproducible, meaning our results should be consistent and reliable [6]. This same standard should apply to our development environments. An environment that can't be created automatically and reliably is not truly reproducible. This inconsistency at the very foundation of our work means we can't be confident that code tested locally will work the same way for our users, creating a gap between development and deployment.
 
-3. **Effect**  
-   From now on, `preprocessor.joblib` will be generated when needed by a DVC stage instead of being fetched from cache. That way, DVC will not try to pull or push an outdated version with the wrong checksum.
 
-### B. Add a Deterministic “Preprocess” Stage with a Fixed Seed
 
-1. **Reason**  
-   If our preprocessing script uses a fixed random seed (for example, 42), then running
-   ```
-   python scripts/preprocess.py --seed 42 --output data/preprocessor.joblib
-   ```
-   on the same code and raw data will always produce a byte-for-byte identical file. Any random imputations or shuffle orders will follow the same pattern each time.
+## Extension Proposal
 
-2. **Concrete changes**  
-   - Modify `scripts/preprocess.py` to accept a `--seed` argument (use `argparse`) and call `np.random.seed(seed)` (or the equivalent) before any operations that involve randomness.  
-   - Update `dvc.yaml` to include a `preprocess` stage:
-     ```yaml
-     stages:
-       preprocess:
-         cmd: python scripts/preprocess.py --seed 42 --output data/preprocessor.joblib
-         deps:
-           - scripts/preprocess.py
-           - data/raw/training_data.tsv
-         outs:
-           - data/preprocessor.joblib
-     ```
-   - Adjust tests and downstream scripts (feature engineering, model fitting, evaluation) to load `data/preprocessor.joblib` from that path. In `tests/test_preprocessor.py`:
-     ```python
-     import joblib
-     from pathlib import Path
+To fix the problems caused by our manual setup, we will introduce an automated system that handles the entire Kubernetes environment creation. For this, we will use a **`Makefile`**. A `Makefile` is a standard file used in software projects to define simple shortcuts for complex command-line tasks [1]. It allows us to bundle a long sequence of commands into a single, easy-to-remember command, like `make setup`.
 
-     PREPROCESSOR_PATH = Path("data/preprocessor.joblib")
-
-     def test_preprocessor_features():
-         assert PREPROCESSOR_PATH.exists(), "Run `dvc repro` to generate preprocessor.joblib"
-         pre = joblib.load(PREPROCESSOR_PATH)
-         # ... existing feature validation logic ...
-     ```
-
-3. **Outcome**  
-   With a fixed seed, data, and code, DVC will cache exactly one version of `data/preprocessor.joblib`. Future `dvc repro` and `dvc pull` will find the correct hash in the remote cache, and the pipeline will run without failures.
-
-## 4. CI Hash Verification
-
-Even with a deterministic artifact, we need to make sure CI detects unintended changes. To do that:
-
-1. **Create** `expected_hashes.txt` at the repository root (alongside `dvc.yaml`). Add a line like:
-   ```
-   data/preprocessor.joblib 3a7d4f8c9eb2f1a6f68fa2d45e7b9c3a2cdefab1234567890abcdef1234567890
-   ```
-   (Replace the hex string with the actual SHA-256 hash of the artifact generated by running `dvc repro` on the current raw data.)
-
-2. **Modify** `.github/workflows/ci.yml` to include these steps after `dvc pull && dvc repro --no-run-cache`:
-   ```yaml
-   - name: Verify preprocessor.joblib hash
-     run: |
-       echo "Checking preprocessor.joblib consistency"
-       ACTUAL=$(sha256sum data/preprocessor.joblib | cut -d' ' -f1)
-       EXPECTED=$(grep data/preprocessor.joblib expected_hashes.txt | awk '{print $2}')
-       if [ "$ACTUAL" != "$EXPECTED" ]; then
-         echo "✖ Hash mismatch! Actual: $ACTUAL"
-         echo "  Expected: $EXPECTED"
-         exit 1
-       fi
-       echo "✔ preprocessor.joblib is up-to-date"
-   ```
-
-3. **Document** the procedure for updating the hash when data or code changes:
-   ```bash
-   # After changing data or code:
-   dvc repro --no-run-cache
-   sha256sum data/preprocessor.joblib | awk '{print $1}' > expected_hashes.txt
-   git add data/preprocessor.joblib expected_hashes.txt
-   git commit -m "Update preprocessor hash after data change"
-   ```
-   This makes sure CI remains green and that any change to the preprocessor is intentional and recorded.
-
-## 5. Developer Convenience
-
-To help developers regenerate `preprocessor.joblib` without running the full DVC pipeline:
-
-- **Add** a `Makefile` or shell script. For instance, in `Makefile`:
-  ```makefile
-  .PHONY: preproc
-  preproc:
-      python scripts/preprocess.py --seed 42 --output data/preprocessor.joblib
-  ```
-- **Update** `README.md` under “Local setup”:
-  > **Rebuild the Preprocessor**  
-  > If you change raw data or preprocessing code, run:
-  > ```bash
-  > make preproc
-  > ```
-  > to recreate `data/preprocessor.joblib`. Then update `expected_hashes.txt` as shown above before committing.
-
-This gives developers a quick way to regenerate the preprocessor without needing to understand DVC internals.
-
-## 6. Revised Pipeline Flow
-
-![Pipeline Flow](https://github.com/user-attachments/assets/bbd649bf-654e-404b-adb9-2f3900c17059)
-
-- **Before:** `preprocessor.joblib` was a DVC-tracked file that changed checksums unpredictably, causing intermittent failures.
-- **After:** The “Preprocess” stage in `dvc.yaml` deterministically regenerates the same `preprocessor.joblib`. DVC only needs to manage the code and raw data inputs, not a checksum-volatile artifact.
-
-## 7. Evaluation Plan and Next Steps
-
-1. **Fresh Clone + `dvc pull`**  
-   - Clone the repository into a new folder.  
-   - Run `dvc pull`. It should download everything except `preprocessor.joblib`, which will be created by the next step.
-
-2. **`dvc repro` Consistency**  
-   - Run `dvc repro --no-run-cache`.  
-   - Check that `data/preprocessor.joblib` is generated and matches the hash in `expected_hashes.txt`.  
-   - Confirm there are no “missing cache” warnings.
-
-3. **Full Pipeline Run**  
-   - After repro, run the training and evaluation stages:
-     ```bash
-     dvc repro train evaluate
-     ```
-   - Make sure downstream steps finish successfully, producing model artifacts and evaluation reports.
-
-4. **Hash Change on Data Update**  
-   - Edit one line in `data/raw/training_data.tsv` (for example, change the case of a category label).  
-   - Run `dvc repro --no-run-cache`.  
-   - Compute `sha256sum data/preprocessor.joblib`; it should differ from `expected_hashes.txt`.  
-   - If the change is intentional, run:
-     ```bash
-     sha256sum data/preprocessor.joblib | awk '{print $1}' > expected_hashes.txt
-     git add expected_hashes.txt data/preprocessor.joblib
-     git commit -m "Update preprocessor hash after data change"
-     ```
-   - Push and observe that CI passes once `expected_hashes.txt` is updated.
-
-5. **CI Validation**  
-   - Open a new pull request with a minor change (e.g., a comment edit).  
-   - CI should run `dvc pull && dvc repro`, then hash verification.  
-   - Confirm there are no “missing cache” errors or hash mismatches.
-
-6. **Team Approval**  
-   - Ask a few colleagues to clone, run `dvc pull`, then `dvc repro`, and finally run the tests.  
-   - Gather feedback. If anyone still sees a “missing cache” error, revise until it works smoothly.
-
-Once these steps are complete, our pipeline will run reliably across machines, and new contributors can set it up without hassle.
+Our proposed solution is built on three key components, which work together to create a smooth and reliable experience for every developer:
 
 ---
 
-### Supporting References
+#### **Component 1: A single command center (the `Makefile`)**
 
-1. **DVC – Versioning Data and Models**  
-   https://dvc.org/doc/use-cases/versioning-data-and-models  
-2. **DVC – `repro` Command Reference**  
-   https://dvc.org/doc/command-reference/repro  
-3. **StackOverflow: “DVC Missing Cache Files”**  
-   https://stackoverflow.com/questions/79434576/how-to-overcome-missing-cache-files-with-dvc  
-4. **scikit-learn Issue: Non-deterministic Pickle Output**  
-   https://github.com/scikit-learn/scikit-learn/issues/12345
+This part is about creating one central place for all setup commands.
+
+The `Makefile` will act as our project's main control panel. Instead of requiring developers to read a long document and copy-paste over a dozen commands, they will only need to use a few simple, intuitive actions:
+
+*   **`make setup`:** This single command will prepare the entire local Kubernetes cluster, including starting the necessary services and applying all configurations automatically.
+*   **`make deploy`:** This command will install our complete application onto the prepared cluster.
+*   **`make clean`:** This command will completely remove the environment, stopping all services and cleaning up any system changes made during setup.
+
+This turns our setup instructions into an executable tool, allowing developers to focus on their work instead of getting bogged down in procedural details.
+
+---
+
+#### **Component 2:  Smart, error-proof automation**
+
+This part is about making the automation intelligent so it doesn't break things or repeat work unnecessarily.
+
+A key feature of this new system is that it will be smart enough to check the status of the environment before acting. This makes the setup process reliable and efficient, because it's safe to run at any time. For example:
+
+*   **It checks if the cluster is already running:** Before trying to start the local Kubernetes cluster, the script will first check if it’s already active. If it is, the script will simply report that and move on, saving time and preventing errors.
+*   **It verifies configurations first:** The script will check if configurations are already in place before trying to apply them [4]. If a setting is already correct, the script won't waste time applying it again.
+
+This design ensures the setup process is robust. A developer can run `make setup` on a brand new computer or on one where the setup was only halfway done. In both cases, the final result will be a fully working environment, with no manual steps needed.
+
+---
+
+#### **Component 3: Safe and automatic system file updates**
+
+This part addresses the most fragile step of the current process: editing a critical system file.
+
+The script will fully and safely automate all changes to the system's `hosts` file.
+
+1.  **It finds the right IP address automatically:** The script will automatically detect the correct IP address for the local cluster. This removes the need for developers to manually copy and paste it, a common source of mistakes.
+2.  **It makes clean and reversible updates:** Instead of just adding new lines to the `hosts` file—which can lead to clutter and future conflicts—the script will work more cleanly. It will first remove any old entries related to our project before adding the correct new ones. When the environment is removed with `make clean`, these entries will be deleted automatically, leaving the system as it was before.
+
+While this step will still require administrative permission, all the complex and risky logic is now handled by a tested, reliable script. This eliminates the risk of human error and frees the developer from worrying about the details.
+
+
+
+## The New Developer Workflow
+
+The most effective way to understand the impact of this change is to compare the developer's journey before and after its implementation. The difference is a move from a long, fragile procedure to a simple, reliable one.
+
+### **Before: The old, manual process**
+
+A developer setting up the project for the first time had to follow a precise and unforgiving sequence of steps. This journey was filled with opportunities for error:
+
+1.  Start the local cluster with very specific memory and CPU settings [2].
+2.  Enable a required feature on the cluster.
+3.  Install a separate, complex tool called Istio [3].
+4.  Apply several configuration files for Istio's addons.
+5.  Run a specific command to label a part of the cluster.
+6.  Navigate into the `app-helm-chart` directory.
+7.  Download chart dependencies.
+8.  Install the application using Helm [5].
+9.  **Open a new, separate terminal** and run a command (`minikube tunnel`) that must be left running in the background. Forgetting this step breaks the entire setup.
+10. Find and copy the correct IP address from the terminal output.
+11. Use administrator privileges (`sudo`) to manually edit the system's `hosts` file, pasting the IP address and hostnames.
+12. Finally, cross their fingers and open the browser, hoping everything was done correctly.
+
+If any of these 12 steps were performed incorrectly, the developer would face confusing errors and a lengthy debugging session.
+
+### **After: The new, automated process**
+
+With the `Makefile` in place, the developer's journey is dramatically simplified. All the complexity of the old process is now handled behind the scenes.
+
+1.  Open a terminal and run `make setup`.
+    *   This single command automatically handles all the preparation steps: starting the cluster, installing tools, and configuring the system correctly.
+2.  Run `make deploy`.
+    *   This command deploys our application to the fully prepared environment.
+
+That's it. The developer is ready to start working. To shut everything down, they just run `make clean`.
+
+### **Visualizing the difference**
+
+The diagrams below show how the developer's interaction with the system changes. We move from a long chain of manual tasks to a simple, automated workflow.
+
+![image](https://github.com/user-attachments/assets/eb5efbb4-1006-4377-8e77-0e7723bbba1b)
+
+
+
+
+## How to Test the Improvement
+
+To prove that our new automated setup is better, we need to do more than just say it's easier, we need to measure it. The goal of this change is to improve the experience for developers, so our test should focus on human factors like time, errors, and satisfaction.
+
+We will design a simple experiment to compare the old manual process against the new automated one.
+
+### **Our hypothesis**
+
+We believe that **developers using the new `Makefile` will be able to set up a working environment significantly faster, with fewer errors, and with less frustration than developers using the old manual instructions.**
+
+### **The experiment design**
+
+We will run a user test with two groups of participants. The ideal participants would be developers from our team who have *not* yet set up the project on their current machine, or even volunteers from outside the team who are unfamiliar with the project.
+
+1.  **Form two groups:**
+    *   **Group A (The control group):** This group will be given the current `README.md` with the long, manual list of instructions.
+    *   **Group B (The test group):** This group will be given a revised `README.md` that instructs them to use the new `make` commands.
+
+2.  **Give them a clear task:**
+    The task for both groups will be the same: "Follow the instructions to set up the complete application stack on your machine and access the application's front-end in your browser."
+
+3.  **Measure the results:**
+    To get a complete picture, we will measure three things:
+    *   **Time to success (quantitative):** We will time how long it takes each participant, from starting the instructions to successfully loading the application in their browser. A shorter time is better.
+    *   **Number of errors or requests for help (quantitative):** We will count how many times a participant runs into an error they cannot solve on their own or has to ask for help. Fewer errors indicate a clearer, more robust process.
+    *   **User satisfaction (qualitative):** After the task is complete, we will ask each participant to rate the setup process on a scale of 1 to 5 for clarity, ease of use, and overall frustration. Higher scores are better.
+
+### **Defining success**
+
+We will consider this extension a success if the results show a clear improvement for Group B (the `Makefile` users). Specifically, we will be looking for:
+
+*   A **statistically significant reduction** in the average time it takes to complete the setup.
+*   A **noticeably lower number** of errors and requests for help.
+*   **Consistently higher satisfaction scores** reported by the participants.
+
+By running this experiment, we can gather real evidence that our automated solution not only works but also delivers a measurably better and more efficient experience for our entire team.
+
+
+## Supporting References
+
+1. **GNU Make Manual**  
+   https://www.gnu.org/software/make/manual/html_node/Introduction.html
+2. **Minikube Start Guide**  
+   https://minikube.sigs.k8s.io/docs/start/
+3. **Istio on Minikube**  
+   https://istio.io/latest/docs/setup/platform-setup/minikube/
+4. **Idempotency in Ansible Playbooks**  
+   https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#desired-state-and-idempotency
+5. **Helm CLI Reference**  
+   https://helm.sh/docs/helm/helm_install/
+6. **Kubernetes Local Development Patterns**  
+   https://kubernetes.io/docs/tasks/tools/
