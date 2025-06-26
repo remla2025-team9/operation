@@ -40,7 +40,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Release.Name }}-app-frontend-config-{{ .Values.versions.stable.versionLabel }}
-{{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled }}
+{{- if and .Values.appFrontend.canary.enabled .Values.versions.canary.enabled}}
 ---
 apiVersion: v1
 kind: ConfigMap

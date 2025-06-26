@@ -63,7 +63,9 @@ spec:
   image: quay.io/prometheus/alertmanager:v0.25.0
   version: v0.25.0
   replicas: 1
-  configSecret: alertmanager-config
+  alertmanagerConfigSelector:
+    matchLabels:
+      alertmanagerConfig: main
   serviceAccountName: prometheus-k8s
   routePrefix: /
 ---
@@ -85,6 +87,6 @@ spec:
           smarthost: smtp.gmail.com:587
           authUsername: {{ .Values.alertCreds.username }}
           authPassword:
-            name: alertmanager-secret
+            name: {{ .Release.Name }}-alertmanager-secret
             key: smtp_auth_password
           requireTLS: true

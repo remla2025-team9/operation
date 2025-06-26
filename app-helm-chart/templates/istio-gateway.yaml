@@ -14,3 +14,4 @@ spec:
       hosts:
         - {{ .Values.appFrontend.ingress.host | quote }}
         - {{ .Values.appService.ingress.host | quote }}
+        - {{ .Values.grafana.ingress.host | quote }}

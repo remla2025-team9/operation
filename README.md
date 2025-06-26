@@ -175,7 +175,12 @@ vagrant up
 ansible-playbook -u vagrant -i 192.168.56.100, ansible/finalization.yml
 ```
 
-Your cluster is now running. A `kubeconfig` file to access it is located at `vagrant/config/.kubeconfig`. You can use it by setting the `KUBECONFIG` environment variable to this file or simply use the following command.
+Your cluster is now running. A `kubeconfig` file to access it is located at `config/.kubeconfig`. You can use it by setting the `KUBECONFIG` environment variable to this file 
+
+```bash
+export KUBECONFIG=$(pwd)/config/.kubeconfig
+```
+or simply use the following command.
 
 ```bash
 kubectl --kubeconfig config/.kubeconfig ...
@@ -189,7 +194,7 @@ Proceed to **Step 2: Deploy the Application with Helm**.
 
 ### **Step 2: Deploy the Application with Helm**
 
-Before proceeding, ensure kubectl is properly configured to communicate with your cluster. Run `kubectl get nodes` to verify connectivity. You should see your cluster's nodes listed with a status of "Ready". If you encounter errors, double-check that your kubeconfig is correctly set up as described in the previous step. For Minikube, kubectl configuration should happen automatically, while for Vagrant, you'll need to set the KUBECONFIG environment variable or merge the provided config file.
+Before proceeding, ensure kubectl is properly configured to communicate with your cluster. Run `kubectl get nodes -A` to verify connectivity. You should see your cluster's nodes listed with a status of "Ready". If you encounter errors, double-check that your kubeconfig is correctly set up as described in the previous step. For Minikube, kubectl configuration should happen automatically, while for Vagrant, you'll need to set the KUBECONFIG environment variable or merge the provided config file.
 
 The Helm chart supports email alerting, but requires configuration to work. There is no default setup, you must follow these steps to enable alert emails:
 
@@ -200,7 +205,7 @@ The Helm chart supports email alerting, but requires configuration to work. Ther
    - Under "Signing in to Google," find the "App passwords" option (or navigate directly to https://myaccount.google.com/apppasswords)
    - Create a new app password for the application (e.g., "Alert Mail")
 
-2. Modify the `values.yaml` file in the Helm chart to include your email and app password:
+2. Modify the `values.yaml` file in the Helm chart to include your email and app password. The alerts will be sent from this email address:
    ```yaml
    alertCreds:
      username: <your-gmail-address>
@@ -209,7 +214,7 @@ The Helm chart supports email alerting, but requires configuration to work. Ther
 
 > **Note:** You can always change the email alert settings later using the same step-by-step plan. Make sure to update the helm chart after making these modifications.
 
-The mail alerts will be sent from the email address `remla2025team9.alerts@gmail.com`. The credentials to login to this email are:
+The mail alerts will be sent to the email address `remla2025team9.alerts@gmail.com`. The credentials to login to this email are:
 ```text
 Username: remla2025team9.alerts@gmail.com
 Password: team9-alerts
@@ -229,12 +234,10 @@ Once your cluster is running, deploy the application using the provided Helm cha
     ```
 
 3.  **Install the Helm Chart:**
-    This command deploys all project services, ingresses, and configurations to your cluster.
     ```bash
     # You can change 'my-app' to any release name you prefer
     helm install my-app .
     ```
-
 ---
 
 ### **Step 3: Access the Application Locally**
@@ -259,7 +262,10 @@ To access the application from your browser, you must map the service hostnames 
         ```bash
         # Replace {{ INGRESS_IP }} with 127.0.0.1 for Minikube or 192.168.56.91 for Vagrant
         # This command adds all required hostnames for the default setup
-        sudo sh -c "echo '{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local' >> /etc/hosts"
+        sudo sh -c "echo '{{ INGRESS_IP }} app-frontend.k8s.local app-service.k8s.local grafana.k8s.local' >> /etc/hosts"
+
+        # If you are running the vagrant setup, also add the Kubernetes dashboard hostnam
+        sudo sh -c "echo '192.168.56.90 dashboard.k8s.local' >> /etc/hosts"
         
         # Verify the entry was added
         cat /etc/hosts
@@ -275,6 +281,10 @@ To access the application from your browser, you must map the service hostnames 
     You can now navigate to the services:
     *   **App-frontend:** `http://app-frontend.k8s.local`
     *   **App-backend:** `http://app-service.k8s.local`
+    *   ***Grafana:** `http://grafana.k8s.local`
+    *   **Kubernetes Dashboard (Vagrant Only):** `http://dashboard.k8s.local`
+  > **Note:** You have to wait for the services to be fully deployed and ready. You can check the status with `kubectl get pods -A` to see if all pods are in the "Running" state.
+
 
 
 ## Interacting with Your Kubernetes Deployment
@@ -286,18 +296,28 @@ You can change default settings like hostnames, replica counts, or container ver
 
 > **Important:** If you change the hostnames of app-frontend or app-service in `values.yaml`, remember to update the corresponding entries in your local `hosts` file as explained in Step 3 of the Kubernetes Deployment instructions. Otherwise, your browser won't be able to resolve the custom hostnames to your cluster's IP address. Similarly, if you modify the service ports in `values.yaml`, you'll need to include those ports in your URLs when accessing the services (e.g., `http://app-frontend.k8s.local:8080` instead of the default `http://app-frontend.k8s.local`).
 
+### Accessing the Kubernetes Dashboard (Vagrant Only)
+The Kubernetes Dashboard is a web-based UI for managing your Kubernetes cluster. It is installed by default in the Vagrant setup after running the finalization playbook.
 
-
+1.  **Access the Dashboard:**
+    Make sure the DNS entry for the dashboard is in your `hosts` file as described in Step 3. Then, navigate to the following URL in your browser:
+    ```text
+    http://dashboard.k8s.local
+    ```
+2.  **Log In:**
+    Generate a token for authentication with the following command:
+    ```bash
+    kubectl -n kubernetes-dashboard create token admin-user
+    ```
+    Copy the generated token and paste it into the login form on the dashboard.
 ### Viewing the Grafana Dashboard
 Grafana is installed for monitoring application metrics.
 
 1.  **Access the Grafana UI:**
-    Use `kubectl port-forward` to access the Grafana service from your local machine.
-    ```bash
-    # This forwards the service's port 80 to your local port 1234
-    kubectl port-forward svc/my-app-grafana 1234:80
+    Make sure the DNS entry for Grafana is in your `hosts` file as described in Step 3. Then, navigate to the following URL in your browser:
+    ```text
+    http://grafana.k8s.local
     ```
-    Navigate to `http://localhost:1234` in your browser.
 
 2.  **Log In:**
     *   **Username:** `admin`

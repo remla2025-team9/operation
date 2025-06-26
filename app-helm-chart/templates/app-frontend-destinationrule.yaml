@@ -13,4 +13,3 @@ spec:
       labels:
         version: {{ .Values.versions.canary.versionLabel }}
     {{- end }}
-
