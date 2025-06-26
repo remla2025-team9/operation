@@ -331,14 +331,28 @@ Grafana is installed for monitoring application metrics.
     These dashboards can be accessed from the Grafana dashboard page after login.
 
 ### Testing Istio Rate Limiting
-The deployment includes a rate limit of 10 requests per minute per IP. You can test this with `curl`.
-```bash
-# This loop sends 20 requests to the frontend
-for i in {1..20}; do
-  curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1/
-done
-```
-You will see several `200` (OK) responses, followed by `429` (Too Many Requests).
+
+- Run the following commands:
+
+  ```bash
+  # Apply rate limit ConfigMap and EnvoyFilter
+  kubectl apply -f rate-limiting.yaml -n istio-system
+
+  # Deploy the rate limit service
+  kubectl apply -f path/to/istio/samples/ratelimit/rate-limit-service.yaml -n istio-system
+  ```
+- Test Rate Limiting:
+
+  Replace the `GATEWAY_PORT` value with your actual NodePort (found via `kubectl -n istio-system get svc istio-ingressgateway`).
+
+  ```bash
+  export GATEWAY_PORT=30530  # Replace with your actual port
+
+  for i in {1..20}; do
+    curl -H "Host: app-frontend.k8s.local" -s -o /dev/null -w "%{http_code}\n" http://192.168.49.2:$GATEWAY_PORT/
+  done
+  ```
+  If over 10 requests are made within one minute, subsequent ones should return a 429 Too Many Requests error.
 
 
 ### Canary Deployment & Experimentation
