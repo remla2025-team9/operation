@@ -234,7 +234,6 @@ Once your cluster is running, deploy the application using the provided Helm cha
     ```
 
 3.  **Install the Helm Chart:**
-    This command deploys all project services, ingresses, and configurations to your cluster. It is possible to either run the charts with the Ingress gateway or the Istio gateway. The default is the Istio gateway, but you can change this in the `values.yaml` file by modifying the boolean value of `useNginxIngress`. If you set it to `true`, the chart will use the Nginx Ingress controller instead of Istio.
     ```bash
     # You can change 'my-app' to any release name you prefer
     helm install my-app .
