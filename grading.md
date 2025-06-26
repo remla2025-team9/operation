@@ -230,7 +230,15 @@ We have structured this document by assignment, with a subsection for each rubri
 
 *   **Expected Level:** `Excellent`
 *   **Implementation:**
-    - 
+    - **(Sufficient)** The project is a Python project
+    - **(Sufficient)** The pipeline stages are split into data loading, data preparing, training and evaluating. Each stage calls a seperate script.
+    - **(Sufficient)** All dependencies are formulated in a requirements.txt file
+    - **(Sufficient)** The project layout is inspired by the Cookiecutter template. Some additional folders are added for testing, linting, and plugins. These are structured in a folder as well to avoid clutter.
+    - **(Good)** The dataset is stored and downloaded from google drive
+    - **(Good)** Exploratory code can be placed in a seperate notebooks folder
+    - **(Good)** The python project is reduced to the required source code.
+    - **(Excellent)** The model is packaged automatically. It is deployed as a versioned GitHub release through a workflow.
+
 *   **Notes for the Grader:**
 
 ### Pipeline Management with DVC
