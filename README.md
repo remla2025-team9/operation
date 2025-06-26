@@ -238,7 +238,6 @@ Once your cluster is running, deploy the application using the provided Helm cha
     # You can change 'my-app' to any release name you prefer
     helm install my-app .
     ```
-    >**Note:** If you want to use the Nginx Ingress controller instead of Istio, make sure to delete Istio with the following `istioctl uninstall --purge` command
 ---
 
 ### **Step 3: Access the Application Locally**
