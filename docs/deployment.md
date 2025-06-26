@@ -82,6 +82,8 @@ Referring to the complete deployment visualization (Section 2.1), the request fl
 
 ### **External Request Flow**
 
+> **Note:** The hostnames `app-frontend.k8s.local` and `app-service.k8s.local` mentioned below are the default values configured in our deployment. These hostnames can be customized by modifying the `values.yaml` file in the Helm chart before deployment.
+
 1. **User Request**: A user accesses the frontend via a DNS name (`app-frontend.k8s.local`).
 2. **Gateway**: The request enters the cluster through the Istio Gateway.
 3. **Frontend VirtualService Routing**: 
