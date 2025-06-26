@@ -1,81 +1,47 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-ratelimit-config
-  namespace: istio-system
-data:
-  config.yaml: |
-    domain: ratelimit
-    descriptors:
-      # Limit requests to a maximum of 10 requests per minute
-      - key: PATH
-        rate_limit:
-          unit: minute
-          requests_per_unit: 10
----
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
 metadata:
-  name: {{ .Release.Name }}-filter-ratelimit
-  namespace: istio-system
-spec:
-  workloadSelector:
-    # select by label in the same namespace
-    labels:
-      istio: ingressgateway
-  configPatches:
-    # The Envoy config you want to modify
-    - applyTo: HTTP_FILTER
-      match:
-        context: GATEWAY
-        listener:
-          filterChain:
-            filter:
-              name: "envoy.filters.network.http_connection_manager"
-              subFilter:
-                name: "envoy.filters.http.router"
-      patch:
-        operation: INSERT_BEFORE
-        # Adds the Envoy Rate Limit Filter in HTTP filter chain.
-        value:
-          name: envoy.filters.http.ratelimit
-          typed_config:
-            "@type": type.googleapis.com/envoy.extensions.filters.http.ratelimit.v3.RateLimit
-            # domain can be anything! Match it to the ratelimter service config
-            domain: ratelimit
-            failure_mode_deny: false
-            timeout: 10s
-            rate_limit_service:
-              grpc_service:
-                envoy_grpc:
-                  cluster_name: outbound|8081||ratelimit.istio-system.svc.cluster.local
-                  authority: ratelimit.istio-system.svc.cluster.local
-              transport_api_version: V3
----
-apiVersion: networking.istio.io/v1alpha3
-kind: EnvoyFilter
-metadata:
-  name: {{ .Release.Name }}-filter-ratelimit-svc
-  namespace: istio-system
+  name: {{ .Release.Name }}-rate-limit-filter
+  namespace: istio-system 
 spec:
   workloadSelector:
     labels:
       istio: ingressgateway
   configPatches:
-    - applyTo: VIRTUAL_HOST
-      match:
-        context: GATEWAY
-        routeConfiguration:
-          vhost:
-            name: ""
-            route:
-              action: ANY
-      patch:
-        operation: MERGE
-        # Applies the rate limit rules.
-        value:
-          rate_limits:
-            - actions: # any actions in here
-                - request_headers:
-                    header_name: ":path"
-                    descriptor_key: "PATH"
+  - applyTo: HTTP_FILTER
+    match:
+      context: GATEWAY
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.filters.http.local_ratelimit
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+          stat_prefix: http_local_rate_limiter
+          # Rate at 10 requests per minute
+          token_bucket:
+            max_tokens: 10 # Maximum number of tokens in the bucket
+            tokens_per_fill: 10 # Number of tokens to add per fill interval
+            fill_interval: 60s  # Interval at which tokens are added
+          # Check 100% of requests
+          filter_enabled: 
+            default_value:
+              numerator: 100
+              denominator: HUNDRED
+          # Enforce rate limiting on 100% of requests
+          filter_enforced:
+            default_value:
+              numerator: 100
+              denominator: HUNDRED
+          # Response headers to add when rate limit is exceeded
+          response_headers_to_add:
+            - append: false
+              header:
+                key: x-local-rate-limit
+                value: 'true'
+          status:
+            code: 429
