@@ -183,7 +183,7 @@ We have structured this document by assignment, with a subsection for each rubri
 *   **Expected Level:** `Excellent`
 *   **Implementation:**
     - **(Sufficient)** The `my-dashboard` in `grafana-dashboards` folder exists and illustrate all custom metrics.
-    - **(Sufficient)** The `my-dashboard` is a JSON fileand can be imported manually.
+    - **(Sufficient)** The `my-dashboard` is a JSON file and can be imported manually.
     - **(Sufficient)** The README.md in operation repository contains relevant content to explain manual installation.
     - **(Good)** The dashboard contains a Gauge panel to display the average number of reviews currently awaiting confirmation over the selected time interval. The Counter panel focuses on number of submitted reviews in recent periods.
     - **(Good)** The dashboard uses time range variables like `$__interval` to make queries dynamically adjust based on the selected timeframe.
