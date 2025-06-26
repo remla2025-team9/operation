@@ -128,6 +128,8 @@ That's it. The developer is ready to start working. To shut everything down, the
 The diagrams below show how the developer's interaction with the system changes. We move from a long chain of manual tasks to a simple, automated workflow.
 
 ![image](https://github.com/user-attachments/assets/80367383-3eb7-42a0-9bf0-670cea90e7a9)
+![image](https://github.com/user-attachments/assets/cd9d9796-b188-4e7b-b800-6a122ba36031)
+
 
 
 
