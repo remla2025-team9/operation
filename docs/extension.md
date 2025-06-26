@@ -134,7 +134,7 @@ The diagrams below show how the developer's interaction with the system changes.
 
 ## How to Test the Improvement
 
-To prove that our new automated setup is better, we need to do more than just say it's easier; we need to measure it. The goal of this change is to improve the experience for developers, so our test should focus on human factors like time, errors, and satisfaction.
+To prove that our new automated setup is better, we need to do more than just say it's easier, we need to measure it. The goal of this change is to improve the experience for developers, so our test should focus on human factors like time, errors, and satisfaction.
 
 We will design a simple experiment to compare the old manual process against the new automated one.
 
@@ -147,17 +147,17 @@ We believe that **developers using the new `Makefile` will be able to set up a w
 We will run a user test with two groups of participants. The ideal participants would be developers from our team who have *not* yet set up the project on their current machine, or even volunteers from outside the team who are unfamiliar with the project.
 
 1.  **Form two groups:**
-    *   **Group A (The Control Group):** This group will be given the current `README.md` with the long, manual list of instructions.
-    *   **Group B (The Test Group):** This group will be given a revised `README.md` that instructs them to use the new `make` commands.
+    *   **Group A (The control group):** This group will be given the current `README.md` with the long, manual list of instructions.
+    *   **Group B (The test group):** This group will be given a revised `README.md` that instructs them to use the new `make` commands.
 
 2.  **Give them a clear task:**
     The task for both groups will be the same: "Follow the instructions to set up the complete application stack on your machine and access the application's front-end in your browser."
 
 3.  **Measure the results:**
     To get a complete picture, we will measure three things:
-    *   **Time to Success (Quantitative):** We will time how long it takes each participant, from starting the instructions to successfully loading the application in their browser. A shorter time is better.
-    *   **Number of Errors or "Help" Requests (Quantitative):** We will count how many times a participant runs into an error they cannot solve on their own or has to ask for help. Fewer errors indicate a clearer, more robust process.
-    *   **User Satisfaction (Qualitative):** After the task is complete, we will ask each participant to rate the setup process on a scale of 1 to 5 for clarity, ease of use, and overall frustration. Higher scores are better.
+    *   **Time to success (quantitative):** We will time how long it takes each participant, from starting the instructions to successfully loading the application in their browser. A shorter time is better.
+    *   **Number of errors or requests for help (quantitative):** We will count how many times a participant runs into an error they cannot solve on their own or has to ask for help. Fewer errors indicate a clearer, more robust process.
+    *   **User satisfaction (qualitative):** After the task is complete, we will ask each participant to rate the setup process on a scale of 1 to 5 for clarity, ease of use, and overall frustration. Higher scores are better.
 
 ### **Defining success**
 
