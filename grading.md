@@ -249,8 +249,12 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Code Quality
 
-*   **Expected Level:** `[Your Expected Level]`
-*   **Implementation:**
+* **Expected Level:** `Excellent`
+* **Implementation:**
+    - **(Sufficient)** The project includes a valid `.pylintrc` with non-default configuration and naming conventions tailored to the codebase.
+    - **(Sufficient)** Running `pylint` on the codebase results in a perfect score of 10.00/10, with no warnings or errors.
+    - **(Good)** The project uses multiple linters (`flake8`, `bandit`, `pylint`) configured via dedicated files (`.flake8`, `bandit.yaml`, `.pylintrc`), with tailored rule sets.
+    - **(Excellent)** A custom `pylint` rule is implemented in `plugin/ml_code_smells_checker.py`. It defines a `RandomSeedChecker` that detects hardcoded random seeds, which are ML-specific code smells.
 *   **Notes for the Grader:**
 
 ---
@@ -299,6 +303,11 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Extension Proposal
 
-*   **Expected Level:** `[Your Expected Level]`
-*   **Implementation:**
+* **Expected Level:** `Excellent`
+* **Implementation:**
+    - **(Sufficient)** The documentation describes a clear release engineering shortcoming: the complex, manual setup process for running the app on Minikube.
+    - **(Sufficient)** The proposed extension automates this setup using a `Makefile`, addressing onboarding delays, reproducibility issues, and system misconfiguration risks.
+    - **(Sufficient)** The extension is new and not covered in any rubric block. Sources like GNU Make, Minikube, and Ansible best practices are cited.
+    - **(Good)** The shortcomings are critically reflected on, describing the time cost, setup inconsistency, and permission issues of the current approach. A structured user experiment is proposed to measure improvement using metrics like time-to-setup and user satisfaction.
+    - **(Excellent)** The extension is general and applicable to any Kubernetes-based project using Minikube or similar tools. It clearly resolves the stated shortcoming and replaces manual steps with safe, reproducible automation.
 *   **Notes for the Grader:**
