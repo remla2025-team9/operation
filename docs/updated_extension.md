@@ -127,33 +127,8 @@ That's it. The developer is ready to start working. To shut everything down, the
 
 The diagrams below show how the developer's interaction with the system changes. We move from a long chain of manual tasks to a simple, automated workflow.
 
-**Before: A long and fragile path**
-```mermaid
-graph TD
-    Dev[Developer] --> A[Start Minikube];
-    A --> B[Enable Addons];
-    B --> C[Install Istio];
-    C --> D[Apply Configs];
-    D --> E[Label Namespace];
-    E --> F[Run Helm];
-    F --> G[Run Tunnel];
-    G --> H[Edit hosts File];
-    H --> Result{Working?<br/>(Maybe)};
-```
+![image](https://github.com/user-attachments/assets/80367383-3eb7-42a0-9bf0-670cea90e7a9)
 
-**After: A simple, reliable path**
-```mermaid
-graph TD
-    Dev[Developer] --> MakeSetup{Run `make setup`};
-    subgraph "Automation Hides Complexity"
-        MakeSetup --> A[Starts Minikube];
-        A --> B[Installs Istio];
-        B --> C[Configures System];
-        C --> D[Ready for Deployment!];
-    end
-    D --> Deploy{Run `make deploy`};
-    Deploy --> Result[Working!<br/>(Guaranteed)];
-```
 
 
 ## How to Test the Improvement
