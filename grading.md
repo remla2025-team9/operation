@@ -243,8 +243,11 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Pipeline Management with DVC
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
+    - **(Sufficient)** Pipeline works, and is reproducible. AWS S3 used as remote storage with documentation on how to set it up.
+    - **(Good)** Metrics are defined which contain accuracy, cloud-based remote with S3 and rollback capabilities.
+    - **(Excellent)** Metrics go beyond accuracy and can be displayed with `dvc exp show`.
 *   **Notes for the Grader:**
 
 ### Code Quality
@@ -297,9 +300,11 @@ We have structured this document by assignment, with a subsection for each rubri
 
 ### Deployment Documentation
 
-*   **Expected Level:** `[Your Expected Level]`
+*   **Expected Level:** `Excellent`
 *   **Implementation:**
-*   **Notes for the Grader:**
+    - **(Sufficient)** Documentation explain the deployment structure, flow of traffic and a visualization.
+    - **(Good)** Documentation includes all the deployed resources, their purpose and relationships.
+    - **(Excellent)** This is a subjective rubric, but we consider that upon reading this documentation, the reader will have a good understanding of the deployment and how to contribute to it.
 
 ### Extension Proposal
 
