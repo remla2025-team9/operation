@@ -20,7 +20,7 @@ modelService:
     image:
       tag: latest
     config:
-      MODEL_VERSION: "v0.0.3-pre.0"
+      MODEL_VERSION: "v1.0.0"
       SERVICE_PORT: "5001"
       SERVICE_HOST: "0.0.0.0"
   # Canary deployment settings specific to the model service.
@@ -30,7 +30,7 @@ modelService:
     image:
       tag: canary
     config:
-      MODEL_VERSION: "v0.0.3-pre.0"
+      MODEL_VERSION: "v1.0.0"
       SERVICE_PORT: "5001"
       SERVICE_HOST: "0.0.0.0"
   image:
@@ -116,6 +116,11 @@ grafana:
           editable: true
           options:
             path: /var/lib/grafana/dashboards/default
+  ingress:
+    host: "grafana.k8s.local"
+  
+  service:
+    port: 80
 
   dashboardsConfigMaps:
     default: "grafana-dashboards"
@@ -126,6 +131,10 @@ alertCreds:
   password: "" # Password for alerting credentials, if required (see README for details)
 
 kube-prometheus-stack:
+  grafana:
+    grafana.ini:
+        server:
+          root_url: "%(protocol)s://%(domain)s/"
   prometheusOperator:
     admissionWebhooks:
       enabled: false

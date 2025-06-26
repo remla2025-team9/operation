@@ -83,15 +83,14 @@
         release_state: present
         wait: yes
         wait_timeout: 300s
-
+  
     - name: Apply Dashboard RBAC manifest
       ansible.builtin.command: |
-          kubectl apply -f yamls/dashboard-rbac.yaml
-
+          kubectl apply -f /home/vagrant/yamls/dashboard-rbac.yaml
 
     - name: Apply Dashboard Ingress manifest
       ansible.builtin.command: |
-          kubectl apply -f yamls/dashboard-ingress.yaml
+          kubectl apply -f /home/vagrant/yamls/dashboard-ingress.yaml
 
     - name: Get system architecture
       ansible.builtin.command: uname -m
