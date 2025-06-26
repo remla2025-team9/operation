@@ -37,13 +37,13 @@ The current setup procedure causes real problems that slow down the entire proje
     Getting started on a project should be easy. The hard part should be the project's real challenges, not the setup instructions. Our current lengthy and error-prone process is a major roadblock for new contributors. Instead of being able to start contributing right away, they often spend their first days fighting with complex steps and debugging their environment. This is frustrating and can be very discouraging for someone new to the project.
 
 *   **Lack of environment reproducibility**  
-    Our project is built on the idea that our work should be reproducible, meaning our results should be consistent and reliable. This same standard should apply to our development environments. An environment that can't be created automatically and reliably is not truly reproducible. This inconsistency at the very foundation of our work means we can't be confident that code tested locally will work the same way for our users, creating a gap between development and deployment.
+    Our project is built on the idea that our work should be reproducible, meaning our results should be consistent and reliable [6]. This same standard should apply to our development environments. An environment that can't be created automatically and reliably is not truly reproducible. This inconsistency at the very foundation of our work means we can't be confident that code tested locally will work the same way for our users, creating a gap between development and deployment.
 
 
 
 ## Extension Proposal
 
-To fix the problems caused by our manual setup, we will introduce an automated system that handles the entire Kubernetes environment creation. For this, we will use a **`Makefile`**. A `Makefile` is a standard file used in software projects to define simple shortcuts for complex command-line tasks. It allows us to bundle a long sequence of commands into a single, easy-to-remember command, like `make setup`.
+To fix the problems caused by our manual setup, we will introduce an automated system that handles the entire Kubernetes environment creation. For this, we will use a **`Makefile`**. A `Makefile` is a standard file used in software projects to define simple shortcuts for complex command-line tasks [1]. It allows us to bundle a long sequence of commands into a single, easy-to-remember command, like `make setup`.
 
 Our proposed solution is built on three key components, which work together to create a smooth and reliable experience for every developer:
 
@@ -70,7 +70,7 @@ This part is about making the automation intelligent so it doesn't break things 
 A key feature of this new system is that it will be smart enough to check the status of the environment before acting. This makes the setup process reliable and efficient, because it's safe to run at any time. For example:
 
 *   **It checks if the cluster is already running:** Before trying to start the local Kubernetes cluster, the script will first check if it’s already active. If it is, the script will simply report that and move on, saving time and preventing errors.
-*   **It verifies configurations first:** The script will check if configurations are already in place before trying to apply them. If a setting is already correct, the script won't waste time applying it again.
+*   **It verifies configurations first:** The script will check if configurations are already in place before trying to apply them [4]. If a setting is already correct, the script won't waste time applying it again.
 
 This design ensures the setup process is robust. A developer can run `make setup` on a brand new computer or on one where the setup was only halfway done. In both cases, the final result will be a fully working environment, with no manual steps needed.
 
@@ -97,14 +97,14 @@ The most effective way to understand the impact of this change is to compare the
 
 A developer setting up the project for the first time had to follow a precise and unforgiving sequence of steps. This journey was filled with opportunities for error:
 
-1.  Start the local cluster with very specific memory and CPU settings.
+1.  Start the local cluster with very specific memory and CPU settings [2].
 2.  Enable a required feature on the cluster.
-3.  Install a separate, complex tool called Istio.
+3.  Install a separate, complex tool called Istio [3].
 4.  Apply several configuration files for Istio's addons.
 5.  Run a specific command to label a part of the cluster.
 6.  Navigate into the `app-helm-chart` directory.
 7.  Download chart dependencies.
-8.  Install the application using Helm.
+8.  Install the application using Helm [5].
 9.  **Open a new, separate terminal** and run a command (`minikube tunnel`) that must be left running in the background. Forgetting this step breaks the entire setup.
 10. Find and copy the correct IP address from the terminal output.
 11. Use administrator privileges (`sudo`) to manually edit the system's `hosts` file, pasting the IP address and hostnames.
