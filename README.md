@@ -24,6 +24,10 @@ You can click on the repository name to navigate to the corresponding GitHub pag
 - **`app-helm-chart/`** - Kubernetes deployment files using Helm
 - **`vagrant/`** - Scripts to provision a multi-node Kubernetes cluster using VMs through Vagrant and Ansible
 - **`docs/`** - Documentation files
+- **`grading.md`** - Documentation with the grading we expect to achieve for all rubrics with an explanation
+- **`ACTIVITY.md`** - Documentation on PRs created and approved by all team members
+
+The `grading.md` file serves as our self-assessment document where we've documented the expected grades for all project rubrics along with detailed explanations of how our implementation meets each criterion. This file provides transparency into our evaluation approach and helps reviewers understand the rationale behind our technical decisions.
 
 ## Getting Started
 
@@ -63,7 +67,7 @@ This is the simplest way to get all services running on your local machine.
 
 4.  **Access Services:**
     *   App-frontend: `http://localhost:3000`
-    *   App-backend: `http://localhost:5000`
+    *   App-backend: `http://localhost:5000` (Note: The app-service does not have a regular '/' endpoint. Test uptime using the `/healthcheck` endpoint)
 
 5.  **Stop Services:**
     ```bash
@@ -280,7 +284,7 @@ To access the application from your browser, you must map the service hostnames 
 3.  **Access the Application in Your Browser:**
     You can now navigate to the services:
     *   **App-frontend:** `http://app-frontend.k8s.local`
-    *   **App-backend:** `http://app-service.k8s.local`
+    *   **App-backend:** `http://app-service.k8s.local` (Note: The app-service does not have a regular '/' endpoint. Test uptime using the `/healthcheck` endpoint)
     *   ***Grafana:** `http://grafana.k8s.local`
     *   **Kubernetes Dashboard (Vagrant Only):** `http://dashboard.k8s.local`
   > **Note:** You have to wait for the services to be fully deployed and ready. You can check the status with `kubectl get pods -A` to see if all pods are in the "Running" state.
