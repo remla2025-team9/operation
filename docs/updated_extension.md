@@ -127,8 +127,7 @@ That's it. The developer is ready to start working. To shut everything down, the
 
 The diagrams below show how the developer's interaction with the system changes. We move from a long chain of manual tasks to a simple, automated workflow.
 
-![image](https://github.com/user-attachments/assets/80367383-3eb7-42a0-9bf0-670cea90e7a9)
-![image](https://github.com/user-attachments/assets/cd9d9796-b188-4e7b-b800-6a122ba36031)
+![image](https://github.com/user-attachments/assets/eb5efbb4-1006-4377-8e77-0e7723bbba1b)
 
 
 
@@ -172,3 +171,16 @@ By running this experiment, we can gather real evidence that our automated solut
 
 
 ## Supporting References
+
+1. **GNU Make Manual**  
+   https://www.gnu.org/software/make/manual/html_node/Introduction.html
+2. **Minikube Start Guide**  
+   https://minikube.sigs.k8s.io/docs/start/
+3. **Istio on Minikube**  
+   https://istio.io/latest/docs/setup/platform-setup/minikube/
+4. **Idempotency in Ansible Playbooks**  
+   https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#desired-state-and-idempotency
+5. **Helm CLI Reference**  
+   https://helm.sh/docs/helm/helm_install/
+6. **Kubernetes Local Development Patterns**  
+   https://kubernetes.io/docs/tasks/tools/
